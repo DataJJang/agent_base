@@ -1,0 +1,16 @@
+---
+description: game family rules
+globs:
+  - "Assets/**/*.cs"
+  - "Packages/**/*.json"
+  - "ProjectSettings/**/*"
+alwaysApply: false
+---
+
+# Game Family Rules
+
+- Apply this rule when `projectFamily` is `game`.
+- Preserve engine version, boot scene, validation method, and target platform assumptions together.
+- Treat `Unity LTS + C#` as the default baseline unless a documented exception exists.
+- Do not casually rename, move, or replace core scenes, platform settings, or validation entrypoints without updating bootstrap docs.
+- Keep client, tooling, and possible backend split explicit in docs.

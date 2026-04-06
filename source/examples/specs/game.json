@@ -1,0 +1,44 @@
+{
+  "repositoryName": "sample-unity-game",
+  "projectName": "Sample Unity Game",
+  "projectPurpose": "Provide a starter Unity-based game prototype.",
+  "projectFamily": "game",
+  "projectNature": "prototype",
+  "repositoryMode": "single-repo",
+  "targetUsers": [
+    "gamers"
+  ],
+  "targetPlatforms": [
+    "Windows",
+    "macOS"
+  ],
+  "runtimeRoles": [
+    "client",
+    "tooling"
+  ],
+  "language": "C#",
+  "runtimeVersion": "Unity LTS",
+  "framework": "Unity",
+  "buildTool": "Unity",
+  "testTool": "Unity validation",
+  "datastore": "없음",
+  "cache": "없음",
+  "deploymentType": "local-only",
+  "startupMode": "Unity player",
+  "loggingMode": "console",
+  "targetOs": [
+    "Windows",
+    "macOS"
+  ],
+  "securityProfile": "없음",
+  "targetEnvironments": [
+    "local",
+    "dev"
+  ],
+  "externalIntegrations": [],
+  "baseDocumentSet": [
+    "README",
+    "test-plan"
+  ],
+  "exceptions": []
+}

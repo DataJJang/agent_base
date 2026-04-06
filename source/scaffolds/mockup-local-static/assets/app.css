@@ -1,0 +1,78 @@
+:root {
+  font-family: "Pretendard", "Noto Sans KR", sans-serif;
+  color: #16202a;
+  background: #faf7f3;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.shell {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  gap: 20px;
+  padding: 24px;
+  background:
+    radial-gradient(circle at top, rgba(222, 174, 114, 0.2), transparent 36%),
+    linear-gradient(180deg, #fffaf4 0%, #f5ede2 100%);
+}
+
+.hero,
+.panel {
+  width: min(720px, 100%);
+  padding: 28px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 18px 44px rgba(83, 56, 16, 0.12);
+}
+
+.badge {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #f4d9b3;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+h1,
+h2,
+p,
+ul {
+  margin: 0;
+}
+
+h1 {
+  margin-top: 16px;
+  font-size: clamp(32px, 6vw, 56px);
+  line-height: 0.95;
+}
+
+p {
+  margin-top: 12px;
+  color: #5f6870;
+}
+
+ul {
+  margin-top: 12px;
+  padding-left: 18px;
+  color: #5f6870;
+}
+
+button {
+  margin-top: 20px;
+  border: 0;
+  border-radius: 14px;
+  background: #2f6fed;
+  color: white;
+  padding: 12px 16px;
+  font: inherit;
+  cursor: pointer;
+}
+

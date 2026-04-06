@@ -1,0 +1,17 @@
+---
+description: frontend runtime-role rules
+globs:
+  - "src/**/*.ts"
+  - "src/**/*.tsx"
+  - "src/**/*.css"
+alwaysApply: false
+---
+
+# Frontend Runtime Role Rules
+
+- Read `docs/ai/services/frontend.md` before large UI changes.
+- If the repository family is `web-app`, `pwa`, or `mockup-local`, read the matching family rule together with this rule.
+- Preserve existing `ListPage`, `DetailPage`, `RegistrationPage`, `ModifyPage`, `Shared`, `Api` patterns.
+- Keep route, type, i18n, and API normalization in sync.
+- Prefer existing grid, search-state, and modal patterns.
+- Keep project-family assumptions, runtime roles, and command-catalog expectations aligned.

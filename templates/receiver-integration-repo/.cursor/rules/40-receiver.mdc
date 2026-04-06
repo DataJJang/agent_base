@@ -1,0 +1,17 @@
+---
+description: receiver runtime-role rules
+globs:
+  - "src/main/java/**/*.java"
+  - "src/main/resources/**/*.yml"
+  - "src/test/java/**/*.java"
+alwaysApply: false
+---
+
+# Receiver Runtime Role Rules
+
+- Read `docs/ai/services/receiver.md` before receiver changes.
+- If the repository family is `receiver-integration`, read the receiver-integration family rule together with this rule.
+- Preserve ingress, parser/decoder, service, publish, and config boundaries.
+- Avoid raw payload dumping in logs.
+- Check protocol parsing, publish flow, and runtime diagnostics together.
+- Keep sample payloads, idempotency assumptions, and diagnostics docs aligned.

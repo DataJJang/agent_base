@@ -1,0 +1,18 @@
+---
+description: web-app family rules
+globs:
+  - "src/**/*.ts"
+  - "src/**/*.tsx"
+  - "src/**/*.css"
+  - "public/**/*"
+  - "package.json"
+alwaysApply: false
+---
+
+# Web App Family Rules
+
+- Apply this rule when `projectFamily` is `web-app`.
+- Use `docs/ai/project-bootstrap.md`, `docs/ai/project-family-map.md`, and `docs/ai/stack-matrix.md` before structural stack changes.
+- Treat `TypeScript + React + Vite` as the default baseline unless a documented exception exists.
+- Keep route, menu, env, API binding, and screen-level smoke validation aligned.
+- Combine this rule with the `frontend` runtime-role rule.

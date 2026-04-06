@@ -1,0 +1,45 @@
+{
+  "repositoryName": "sample-web-app",
+  "projectName": "Sample Web App",
+  "projectPurpose": "Provide a starter browser application for internal operators.",
+  "projectFamily": "web-app",
+  "projectNature": "prototype",
+  "repositoryMode": "single-repo",
+  "targetUsers": [
+    "internal-operators"
+  ],
+  "targetPlatforms": [
+    "browser"
+  ],
+  "runtimeRoles": [
+    "frontend"
+  ],
+  "language": "TypeScript",
+  "runtimeVersion": "18",
+  "framework": "React",
+  "buildTool": "npm",
+  "testTool": "npm test",
+  "datastore": "없음",
+  "cache": "없음",
+  "deploymentType": "static-hosting",
+  "startupMode": "SPA",
+  "loggingMode": "console",
+  "targetOs": [
+    "Windows",
+    "macOS",
+    "Linux"
+  ],
+  "securityProfile": "없음",
+  "targetEnvironments": [
+    "local",
+    "dev"
+  ],
+  "externalIntegrations": [
+    "backend-service"
+  ],
+  "baseDocumentSet": [
+    "README",
+    "test-plan"
+  ],
+  "exceptions": []
+}

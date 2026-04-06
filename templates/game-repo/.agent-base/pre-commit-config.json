@@ -1,0 +1,12 @@
+{
+  "mode": "auto",
+  "presetProfile": "auto",
+  "customCommands": [],
+  "additionalCommands": [],
+  "unityValidationCommands": [],
+  "runLintOnHook": true,
+  "runTypecheckOnHook": true,
+  "runBuildOnHook": false,
+  "runTestOnHook": false,
+  "failWhenNoChecksRun": false
+}

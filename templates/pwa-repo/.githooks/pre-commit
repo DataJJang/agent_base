@@ -1,0 +1,12 @@
+#!/bin/sh
+set -eu
+
+REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+cd "$REPO_ROOT"
+
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "[pre-commit] python3 is required to run repository checks."
+  exit 1
+fi
+
+python3 scripts/precommit_check.py

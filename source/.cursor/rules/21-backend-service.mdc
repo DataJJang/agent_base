@@ -1,0 +1,17 @@
+---
+description: backend-service family rules
+globs:
+  - "src/main/java/**/*.java"
+  - "src/main/resources/**/*.yml"
+  - "src/test/java/**/*.java"
+  - "db/**/*"
+  - "sql/**/*"
+alwaysApply: false
+---
+
+# Backend Service Family Rules
+
+- Apply this rule when `projectFamily` is `backend-service`.
+- Keep API contract, auth, config, DB compatibility, and rollout assumptions aligned.
+- Treat `Java 11 + Spring Boot 2.3.x` as the default baseline unless a documented exception exists.
+- Combine this rule with the `api` runtime-role rule.

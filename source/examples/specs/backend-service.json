@@ -1,0 +1,49 @@
+{
+  "repositoryName": "sample-backend-service",
+  "projectName": "Sample Backend Service",
+  "projectPurpose": "Provide a starter backend API for internal services.",
+  "projectFamily": "backend-service",
+  "projectNature": "prototype",
+  "repositoryMode": "single-repo",
+  "targetUsers": [
+    "internal-operators"
+  ],
+  "targetPlatforms": [
+    "server"
+  ],
+  "runtimeRoles": [
+    "api"
+  ],
+  "language": "Java",
+  "runtimeVersion": "11",
+  "framework": "Spring Boot",
+  "buildTool": "Gradle",
+  "testTool": "Gradle test",
+  "datastore": "MariaDB",
+  "cache": "Redis",
+  "deploymentType": "container",
+  "startupMode": "long-running-service",
+  "loggingMode": "structured-json",
+  "targetOs": [
+    "Linux"
+  ],
+  "securityProfile": "JWT",
+  "packageName": "com.example.samplebackend",
+  "targetEnvironments": [
+    "local",
+    "dev",
+    "stg"
+  ],
+  "externalIntegrations": [
+    "internal-api"
+  ],
+  "dbEngine": "MariaDB 10.x",
+  "schemaOwnership": "owned",
+  "migrationPath": "db/migration",
+  "baseDocumentSet": [
+    "README",
+    "deployment-checklist",
+    "test-plan"
+  ],
+  "exceptions": []
+}

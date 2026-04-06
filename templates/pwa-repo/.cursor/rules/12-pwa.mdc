@@ -1,0 +1,18 @@
+---
+description: pwa family rules
+globs:
+  - "src/**/*.ts"
+  - "src/**/*.tsx"
+  - "src/**/*.css"
+  - "public/**/*"
+  - "package.json"
+alwaysApply: false
+---
+
+# PWA Family Rules
+
+- Apply this rule when `projectFamily` is `pwa`.
+- Preserve installability, offline behavior, cache strategy, and fallback UX together.
+- Do not change service worker, manifest, or cache assumptions without updating docs and smoke validation.
+- Treat `TypeScript + React + Vite + PWA plugin` as the default baseline unless a documented exception exists.
+- Combine this rule with the `frontend` runtime-role rule.

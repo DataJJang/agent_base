@@ -1,0 +1,25 @@
+plugins {
+    id 'java-library'
+    id 'application'
+}
+
+group = '__PACKAGE_NAME__'
+version = '0.1.0-SNAPSHOT'
+sourceCompatibility = '11'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+}
+
+application {
+    mainClass = '__PACKAGE_NAME__.__MAIN_CLASS_NAME__'
+}
+
+test {
+    useJUnitPlatform()
+}
+

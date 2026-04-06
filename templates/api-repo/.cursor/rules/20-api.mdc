@@ -1,0 +1,17 @@
+---
+description: api runtime-role rules
+globs:
+  - "src/main/java/**/*.java"
+  - "src/main/resources/**/*.yml"
+  - "src/test/java/**/*.java"
+alwaysApply: false
+---
+
+# API Runtime Role Rules
+
+- Read `docs/ai/services/api.md` before structural changes.
+- If the repository family is `backend-service`, read the backend-service family rule together with this rule.
+- Preserve controller, service, model/VO, repository, and query repository boundaries.
+- Check config, security, API contract, DB compatibility, and rollout impact together.
+- If schema or query work is involved, also read `docs/ai/database-rules.md`.
+- Prefer compile or test verification before completion.

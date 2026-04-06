@@ -1,0 +1,19 @@
+---
+description: batch runtime-role rules
+globs:
+  - "src/main/java/**/*.java"
+  - "src/main/resources/**/*.xml"
+  - "src/main/resources/**/*.yml"
+  - "src/test/java/**/*.java"
+  - "ops-alerting-v1/**"
+alwaysApply: false
+---
+
+# Batch Runtime Role Rules
+
+- Read `docs/ai/services/batch.md` before batch changes.
+- If the repository family is `batch-worker`, read the batch-worker family rule together with this rule.
+- Preserve module, job, service, mapper, model, and SQL doc structure.
+- Check scheduler, retry, history, runbook, and deployment checklist impact together.
+- Treat `ops-alerting-v1` docs as source of truth for ops-alert features.
+- Keep idempotency, retry, verification query, and rollback notes aligned with the batch flow.

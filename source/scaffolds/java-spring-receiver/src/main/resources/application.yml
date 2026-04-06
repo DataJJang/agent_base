@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: __REPOSITORY_NAME__
+
+server:
+  port: 8081
+

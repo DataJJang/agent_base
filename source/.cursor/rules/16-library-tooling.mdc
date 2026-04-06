@@ -1,0 +1,17 @@
+---
+description: library-tooling family rules
+globs:
+  - "src/**/*"
+  - "scripts/**/*"
+  - "bin/**/*"
+  - "package.json"
+  - "build.gradle"
+alwaysApply: false
+---
+
+# Library Tooling Family Rules
+
+- Apply this rule when `projectFamily` is `library-tooling`.
+- Keep the public surface small and intentional.
+- Separate reusable library behavior from repo-local build or automation scripts.
+- Require at least one sample invocation, usage example, or packaging smoke step in docs.

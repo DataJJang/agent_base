@@ -1,0 +1,17 @@
+---
+description: mockup-local family rules
+globs:
+  - "src/**/*"
+  - "app/**/*"
+  - "public/**/*"
+  - "*.html"
+  - "package.json"
+alwaysApply: false
+---
+
+# Mockup Local Family Rules
+
+- Apply this rule when `projectFamily` is `mockup-local`.
+- Optimize for fast local validation and simple walkthroughs.
+- Avoid introducing production deployment, cache, auth, or DB complexity unless the user explicitly asks for it.
+- Keep local-only assumptions, smoke steps, and non-production constraints explicit in docs.
