@@ -100,6 +100,8 @@ python3 source/scripts/generate_project.py \
 
 ## 8. 예시
 
+- 실제 인터뷰부터 생성까지 이어지는 예시는 [`examples/ai-test-bootstrap-sequence.md`](./examples/ai-test-bootstrap-sequence.md) 를 참고한다.
+
 ```bash
 python3 source/scripts/generate_project.py \
   --spec source/examples/specs/backend-service.json \

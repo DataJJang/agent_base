@@ -64,6 +64,8 @@
   - 실패 케이스를 규약, prompt, template, script 강화로 연결하는 체크리스트
 - `examples/`
   - 산출물 샘플 출력
+  - [`examples/ai-test-bootstrap-sequence.md`](./examples/ai-test-bootstrap-sequence.md)
+    - 실제 `ai-test` 게임 프로젝트를 인터뷰로 생성한 흐름 예시
 
 ## 사용 순서
 
