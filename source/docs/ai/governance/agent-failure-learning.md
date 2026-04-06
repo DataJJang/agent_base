@@ -10,6 +10,8 @@
 - 요청 범위를 벗어난 과도한 변경을 한 경우
 - 필요한 검증을 누락한 경우
 - 위험 명령 또는 위험 SQL을 제어 없이 시도한 경우
+- 역할을 잘못 배정했거나 필수 specialist handoff를 생략한 경우
+- upstream/downstream handoff artifact가 부족해 같은 판단을 반복한 경우
 - 문서, 규칙, 템플릿, prompt가 부족해서 같은 질문이 반복되는 경우
 - 지원되지 않는 스택인데도 unsupported 사실을 분명히 알리지 못한 경우
 - 같은 오류를 팀이 반복적으로 재경험하는 경우
@@ -17,6 +19,8 @@
 ## 3. 실패 케이스 기록 항목
 
 - 저장소명 / 브랜치
+- agent 역할
+- upstream 역할 / downstream 역할
 - 작업 요청 요약
 - 기대 결과
 - 실제 결과
@@ -38,6 +42,10 @@
   - `templates/*`
   - `scripts/*`
   - `checklists/*`
+- 고쳐야 할 역할 체계
+  - role assignment
+  - role prompt
+  - handoff checklist
 - 예방 조치
 - 검증 방법
 
@@ -54,7 +62,7 @@
 
 1. 실패 케이스를 기록한다.
 2. root cause를 분류한다.
-3. 고칠 문서, 프롬프트, 템플릿, 스크립트를 지정한다.
+3. 고칠 문서, 프롬프트, 템플릿, 스크립트, 역할 배정 규칙을 지정한다.
 4. `source/`를 먼저 수정한다.
 5. `templates/*`를 동기화한다.
 6. 같은 실패가 재현되지 않는지 예시 또는 dry-run으로 확인한다.
@@ -85,6 +93,7 @@ python3 scripts/record_agent_failure.py \
 - failure note 또는 retrospective
 - 수정된 규칙 또는 prompt
 - 필요한 template 또는 script 수정
+- 필요한 role prompt 또는 handoff checklist 수정
 - 재검증 결과
 
 ## 8. 추천 주기

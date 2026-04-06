@@ -13,15 +13,17 @@
 5. [`stack-matrix.md`](./stack-matrix.md) 기준으로 언어, 프레임워크, 런타임, 빌드 도구, 테스트 도구를 확정한다.
 6. DB, cache, 배포 유형, 서비스 기동 형태, 로깅 방식, 동작 OS를 확정한다.
 7. [`project-generation-spec.md`](./project-generation-spec.md) 입력값을 모두 채운다.
-8. [`project-selection-mapping.md`](./project-selection-mapping.md) 기준으로 적합한 템플릿과 초기 산출물을 확정한다.
-9. spec JSON을 저장하고 [`project-generator.md`](./project-generator.md) 기준으로 생성기를 실행한다.
-10. 생성된 샘플 저장소에서 `python3 scripts/install_git_hooks.py`를 실행해 local pre-commit gate를 설치한다.
-11. 생성된 샘플 저장소에서 `AGENTS.md`, `docs/ai/command-catalog.md`, `docs/ai/architecture-map.md`를 저장소 실정에 맞게 보정한다.
-12. DB를 소유하는 저장소면 [`database-rules.md`](./database-rules.md) 기준으로 naming, COMMENT, migration, 위험 SQL 원칙을 확정한다.
-13. [`../../checklists/project-interview.md`](../../checklists/project-interview.md) 와 [`../../checklists/project-creation.md`](../../checklists/project-creation.md) 를 완료한다.
-14. `docs/ai/prompts/examples/*` 와 `docs/ai/prompts/*.md`를 사용해 첫 프롬프트를 실행한다.
-15. 첫 build/test/문서 세트를 만든다.
-16. 첫 공유 전달 전 [`../../checklists/first-delivery.md`](../../checklists/first-delivery.md) 를 점검한다.
+8. [`project-selection-mapping.md`](./project-selection-mapping.md) 기준으로 적합한 템플릿, 초기 산출물, 추천 agent 역할 세트를 확정한다.
+9. [`roles/README.md`](./roles/README.md) 와 [`../../checklists/agent-role-selection.md`](../../checklists/agent-role-selection.md) 를 사용해 required/optional 역할을 고른다.
+10. spec JSON을 저장하고 [`project-generator.md`](./project-generator.md) 기준으로 생성기를 실행한다.
+11. 생성된 샘플 저장소에서 `python3 scripts/install_git_hooks.py`를 실행해 local pre-commit gate를 설치한다.
+12. 생성된 샘플 저장소에서 `AGENTS.md`, `docs/ai/command-catalog.md`, `docs/ai/architecture-map.md`를 저장소 실정에 맞게 보정한다.
+13. DB를 소유하는 저장소면 [`database-rules.md`](./database-rules.md) 기준으로 naming, COMMENT, migration, 위험 SQL 원칙을 확정한다.
+14. [`../../checklists/project-interview.md`](../../checklists/project-interview.md), [`../../checklists/agent-role-selection.md`](../../checklists/agent-role-selection.md), [`../../checklists/project-creation.md`](../../checklists/project-creation.md) 를 완료한다.
+15. `docs/ai/prompts/examples/*`, `docs/ai/prompts/*.md`, `docs/ai/prompts/roles/*.md`를 사용해 첫 프롬프트를 실행한다.
+16. 첫 build/test/문서 세트를 만든다.
+17. 역할 간 분업이 있으면 [`../../checklists/agent-handoff.md`](../../checklists/agent-handoff.md) 를 사용해 handoff artifact를 정리한다.
+18. 첫 공유 전달 전 [`../../checklists/first-delivery.md`](../../checklists/first-delivery.md) 와 [`../../checklists/agent-completion-review.md`](../../checklists/agent-completion-review.md) 를 점검한다.
 
 ## 3. 대화형 인터뷰 질문 순서
 
@@ -54,6 +56,8 @@
 19. 외부 연동
 20. 기본 문서 세트
 21. spec 저장 경로와 output root
+
+인터뷰 자체에서 역할을 직접 묻지 않아도 된다. 역할은 인터뷰 결과를 바탕으로 `project-selection-mapping.md`와 `roles/README.md`에서 파생한다.
 
 ## 4. 프로젝트 패밀리 선택 기준
 

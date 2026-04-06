@@ -1,0 +1,49 @@
+# Agent Roles
+
+이 디렉토리는 agentic engineering을 위해 역할을 분리할 때 쓰는 기준 역할군, 책임, 입력/출력, handoff 규칙을 정의한다.
+
+## 사용 원칙
+
+- 역할은 사람 조직도보다 `agentic runtime responsibility` 기준으로 본다.
+- 한 사람 또는 한 agent가 여러 역할을 겸할 수는 있지만, 책임과 산출물은 분리해 기록한다.
+- 프로젝트 패밀리별 필수 역할은 [`project-selection-mapping.md`](../project-selection-mapping.md)를 따른다.
+- 역할 배정은 [`agent-role-selection.md`](../../../checklists/agent-role-selection.md), 역할 간 인수인계는 [`agent-handoff.md`](../../../checklists/agent-handoff.md)를 함께 쓴다.
+
+## 공통 역할군
+
+| 역할 | 핵심 책임 | 주로 필요한 경우 |
+| --- | --- | --- |
+| `orchestrator` | 전체 순서, 역할 배정, handoff 관리 | multi-agent 작업, 변경 영향이 큰 작업 |
+| `product-analyst` | 목적, 범위, 사용자 가치 정리 | 신규 기능, 신규 프로젝트, 요구사항 불명확 |
+| `solution-architect` | 경계, 아키텍처, 기술선정 | 구조 결정, 큰 리팩터링, 신규 서비스 |
+| `bootstrap-planner` | bootstrap, spec, template, scaffold 확정 | 새 프로젝트, 새 저장소 도입 |
+| `runtime-engineer` | 실제 코드/설정 구현 | 모든 구현 작업 |
+| `data-steward` | DB naming, migration, verification, rollback | schema/data/query 변경 |
+| `security-reviewer` | 인증, 권한, secret, 위험작업 검토 | 보안/운영 노출이 있는 작업 |
+| `qa-validator` | build/test/smoke/stage validation | 모든 공유 전달 전 |
+| `docs-operator` | README, runbook, manual, checklist 갱신 | 운영/배포/사용 흐름 영향이 있는 작업 |
+| `release-manager` | rollout, rollback, 배포 점검 | 배포/운영 영향이 큰 작업 |
+| `failure-curator` | 실패 수집과 harness 강화 | 반복 실패, 규약 갭 발견 |
+
+## Runtime Engineer Specializations
+
+`runtime-engineer`는 아래 specialization으로 구체화한다.
+
+- `frontend`
+- `api`
+- `batch`
+- `receiver`
+- `game`
+- `mobile`
+- `tooling`
+
+프로젝트 패밀리와 runtime role에 맞춰 specialization을 붙여 쓴다. 예: `runtime-engineer[api]`, `runtime-engineer[game]`
+
+## 읽는 순서
+
+1. [`orchestrator.md`](./orchestrator.md)
+2. 필요한 전문 역할 문서
+3. [`../prompts/roles/README.md`](../prompts/roles/README.md)
+4. [`../../../checklists/agent-role-selection.md`](../../../checklists/agent-role-selection.md)
+5. [`../../../checklists/agent-handoff.md`](../../../checklists/agent-handoff.md)
+6. [`../../../checklists/agent-completion-review.md`](../../../checklists/agent-completion-review.md)

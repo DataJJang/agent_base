@@ -40,7 +40,19 @@
 | 기본 문서 세트 | `baseDocumentSet` | README, runbook, deployment-checklist, validation guide 등 | 필수 |
 | 예외 사항 | `exceptions` | 공통 권장 스택을 벗어나는 항목과 이유 | 조건부 필수 |
 
-## 2-1. 생성기 입력 예시
+## 2-1. 파생 coordination 필드
+
+아래 필드는 generator v1의 필수 입력은 아니지만, agentic engineering 흐름에서는 같이 정리하는 것을 권장한다.
+
+| 항목 | JSON key | 설명 |
+| --- | --- | --- |
+| 필수 agent 역할 | `requiredAgentRoles` | 프로젝트에 반드시 필요한 역할 목록 |
+| 선택 agent 역할 | `optionalAgentRoles` | 있으면 품질과 속도가 좋아지는 역할 목록 |
+| 역할별 specialization | `roleSpecializations` | `runtime-engineer: game` 같은 specialization |
+| handoff 순서 | `agentWorkflowOrder` | orchestrator부터 validator까지의 기본 순서 |
+| 역할 override | `agentRoleOverrides` | 저장소별 예외 역할 정의 |
+
+## 2-2. 생성기 입력 예시
 
 ```json
 {
@@ -72,7 +84,12 @@
   "schemaOwnership": "owned",
   "migrationPath": "db/migration",
   "baseDocumentSet": ["README", "deployment-checklist", "test-plan"],
-  "exceptions": []
+  "exceptions": [],
+  "requiredAgentRoles": ["orchestrator", "runtime-engineer", "qa-validator", "docs-operator"],
+  "optionalAgentRoles": ["data-steward", "security-reviewer", "release-manager"],
+  "roleSpecializations": ["runtime-engineer: api"],
+  "agentWorkflowOrder": ["orchestrator", "solution-architect", "runtime-engineer", "qa-validator", "docs-operator"],
+  "agentRoleOverrides": []
 }
 ```
 

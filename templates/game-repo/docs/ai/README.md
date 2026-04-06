@@ -24,6 +24,8 @@
   - 프로젝트 패밀리와 하위 런타임 역할의 관계 정의
 - [`project-selection-mapping.md`](./project-selection-mapping.md)
   - 선택값이 어떤 템플릿, 문서, 명령, 초기 산출물로 이어지는지 정의
+- [`roles/README.md`](./roles/README.md)
+  - agentic engineering에서 쓰는 역할군, 책임, handoff 기준 정의
 - [`project-generator.md`](./project-generator.md)
   - 정규화된 spec으로 실제 샘플 프로젝트를 생성하는 절차와 지원 범위 정의
 - [`token-substitution.md`](./token-substitution.md)
@@ -58,8 +60,16 @@
   - Windsurf용 변환 가이드
 - [`prompts/README.md`](./prompts/README.md)
   - 문서 생성 및 프로젝트 생성용 AI 프롬프트 라이브러리
+- [`prompts/roles/README.md`](./prompts/roles/README.md)
+  - 역할별 agent prompt template 라이브러리
 - `../../checklists/`
   - 프로젝트 생성, 첫 전달, DB 변경 체크리스트
+- `../../checklists/agent-role-selection.md`
+  - 프로젝트별 필요한 agent 역할과 optional 역할을 고르는 체크리스트
+- `../../checklists/agent-handoff.md`
+  - 역할 간 handoff artifact와 미해결 이슈를 넘기는 체크리스트
+- `../../checklists/agent-completion-review.md`
+  - 역할 기반 작업 종료 전 완료 기준을 점검하는 체크리스트
 - `../../checklists/agent-failure-review.md`
   - 실패 케이스를 규약, prompt, template, script 강화로 연결하는 체크리스트
 - `examples/`
@@ -75,18 +85,20 @@
 4. `docs/ai/project-generation-spec.md`
 5. `docs/ai/project-family-map.md`
 6. `docs/ai/project-selection-mapping.md`
-7. `docs/ai/project-generator.md`
-8. `docs/ai/token-substitution.md`
-9. `docs/ai/stack-matrix.md`
-10. `docs/ai/architecture-map.md`
-11. `docs/ai/core-rules.md`
-12. 필요 시 `docs/ai/database-rules.md`
-13. `docs/ai/lifecycle.md`
-14. 런타임 역할별 상세 규칙
-15. `docs/ai/governance/quality-gates.md`
-16. `docs/ai/governance/pre-commit-hooks.md`
-17. 필요 시 `docs/ai/governance/agent-failure-learning.md`
-18. 필요 시 `docs/ai/document-routing.md`, `docs/ai/prompts/*`, `checklists/*`
+7. `docs/ai/roles/README.md`
+8. `docs/ai/project-generator.md`
+9. `docs/ai/token-substitution.md`
+10. `docs/ai/stack-matrix.md`
+11. `docs/ai/architecture-map.md`
+12. `docs/ai/core-rules.md`
+13. 필요 시 `docs/ai/database-rules.md`
+14. `docs/ai/lifecycle.md`
+15. 런타임 역할별 상세 규칙
+16. `docs/ai/governance/quality-gates.md`
+17. `docs/ai/governance/pre-commit-hooks.md`
+18. 필요 시 `docs/ai/governance/agent-failure-learning.md`
+19. 필요 시 `docs/ai/prompts/roles/*`
+20. 필요 시 `docs/ai/document-routing.md`, `docs/ai/prompts/*`, `checklists/*`
 
 ## 기본 원칙
 
@@ -96,5 +108,7 @@
 - DB를 소유하는 저장소는 `database-rules.md`를 schema system of record로 삼는다.
 - 상위 분류는 `서비스 유형`이 아니라 `프로젝트 패밀리`다.
 - `frontend`, `api`, `batch`, `receiver`는 상위 패밀리가 아니라 하위 런타임 역할이다.
+- agentic engineering에서는 역할을 분리하되, 한 사람 또는 한 agent가 여러 역할을 겸할 수 있다.
+- 다만 `orchestrator`, `qa-validator`, `docs-operator` 책임은 최종 전달 전 누락되면 안 된다.
 - pre-commit hook는 빠른 local gate이고, 상세 검증은 `command-catalog.md`와 `quality-gates.md`가 맡는다.
 - agent failure는 회고로 끝내지 않고 `governance/agent-failure-learning.md`와 `checklists/agent-failure-review.md`를 통해 문서, prompt, template, script 강화로 환류한다.

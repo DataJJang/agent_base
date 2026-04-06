@@ -6,6 +6,7 @@ This file is the canonical AI guidance entrypoint for a project repository templ
 
 - Canonical guidance starts here.
 - Detailed rules live under [`docs/ai/README.md`](./docs/ai/README.md).
+- Agent role definitions live under [`docs/ai/roles/README.md`](./docs/ai/roles/README.md).
 - Interactive repository bootstrap starts at [`docs/ai/project-bootstrap.md`](./docs/ai/project-bootstrap.md).
 - The recommended executable wrapper for bootstrap is [`docs/ai/project-bootstrap-cli.md`](./docs/ai/project-bootstrap-cli.md) and `source/scripts/project_bootstrap_cli.py`.
 - The normalized creation schema lives in [`docs/ai/project-generation-spec.md`](./docs/ai/project-generation-spec.md).
@@ -19,6 +20,7 @@ This file is the canonical AI guidance entrypoint for a project repository templ
 - Agent failure capture and harness reinforcement rules live under [`docs/ai/governance/agent-failure-learning.md`](./docs/ai/governance/agent-failure-learning.md).
 - Failure recording helper script lives at `scripts/record_agent_failure.py`.
 - Prompt templates live under [`docs/ai/prompts/README.md`](./docs/ai/prompts/README.md).
+- Role-specific prompt templates live under [`docs/ai/prompts/roles/README.md`](./docs/ai/prompts/roles/README.md).
 - Repository bootstrap checklists live under [`checklists/`](./checklists/).
 - Legacy files [`codex.md`](./codex.md) and [`codex-prompts.md`](./codex-prompts.md) are migration pointers only.
 
@@ -44,6 +46,20 @@ This file is the canonical AI guidance entrypoint for a project repository templ
 - `tooling`
 - `worker`
 
+## Agentic Roles Supported By This Template
+
+- `orchestrator`
+- `product-analyst`
+- `solution-architect`
+- `bootstrap-planner`
+- `runtime-engineer`
+- `data-steward`
+- `security-reviewer`
+- `qa-validator`
+- `docs-operator`
+- `release-manager`
+- `failure-curator`
+
 ## Read Order
 
 1. This `AGENTS.md`
@@ -52,23 +68,27 @@ This file is the canonical AI guidance entrypoint for a project repository templ
 4. [`docs/ai/project-generation-spec.md`](./docs/ai/project-generation-spec.md)
 5. [`docs/ai/project-family-map.md`](./docs/ai/project-family-map.md)
 6. [`docs/ai/project-selection-mapping.md`](./docs/ai/project-selection-mapping.md)
-7. [`docs/ai/project-generator.md`](./docs/ai/project-generator.md)
-8. [`docs/ai/token-substitution.md`](./docs/ai/token-substitution.md)
-9. [`docs/ai/stack-matrix.md`](./docs/ai/stack-matrix.md)
-10. [`docs/ai/core-rules.md`](./docs/ai/core-rules.md)
-11. [`docs/ai/database-rules.md`](./docs/ai/database-rules.md) when the repo owns schema, migration, SQL, or heavy query work
-12. [`docs/ai/lifecycle.md`](./docs/ai/lifecycle.md)
-13. [`docs/ai/architecture-map.md`](./docs/ai/architecture-map.md)
-14. [`docs/ai/command-catalog.md`](./docs/ai/command-catalog.md)
-15. The relevant runtime-role guide under `docs/ai/services/`
-16. [`docs/ai/governance/quality-gates.md`](./docs/ai/governance/quality-gates.md)
-17. [`docs/ai/governance/git-workflow.md`](./docs/ai/governance/git-workflow.md) when branch, commit, PR, or merge behavior matters
-18. [`docs/ai/governance/pre-commit-hooks.md`](./docs/ai/governance/pre-commit-hooks.md) before enabling local commit gates
-19. [`docs/ai/governance/agent-failure-learning.md`](./docs/ai/governance/agent-failure-learning.md) when repeated mistakes expose harness gaps
-20. [`docs/ai/document-routing.md`](./docs/ai/document-routing.md) when documentation changes are involved
-21. [`checklists/project-interview.md`](./checklists/project-interview.md) when the repository is still in discovery or bootstrap
-22. [`checklists/database-change.md`](./checklists/database-change.md) when schema, migration, seed, or data-correction work is involved
-23. [`checklists/agent-failure-review.md`](./checklists/agent-failure-review.md) when a failure case should be reinforced into the harness
+7. [`docs/ai/roles/README.md`](./docs/ai/roles/README.md)
+8. [`docs/ai/project-generator.md`](./docs/ai/project-generator.md)
+9. [`docs/ai/token-substitution.md`](./docs/ai/token-substitution.md)
+10. [`docs/ai/stack-matrix.md`](./docs/ai/stack-matrix.md)
+11. [`docs/ai/core-rules.md`](./docs/ai/core-rules.md)
+12. [`docs/ai/database-rules.md`](./docs/ai/database-rules.md) when the repo owns schema, migration, SQL, or heavy query work
+13. [`docs/ai/lifecycle.md`](./docs/ai/lifecycle.md)
+14. [`docs/ai/architecture-map.md`](./docs/ai/architecture-map.md)
+15. [`docs/ai/command-catalog.md`](./docs/ai/command-catalog.md)
+16. The relevant runtime-role guide under `docs/ai/services/`
+17. [`docs/ai/governance/quality-gates.md`](./docs/ai/governance/quality-gates.md)
+18. [`docs/ai/governance/git-workflow.md`](./docs/ai/governance/git-workflow.md) when branch, commit, PR, or merge behavior matters
+19. [`docs/ai/governance/pre-commit-hooks.md`](./docs/ai/governance/pre-commit-hooks.md) before enabling local commit gates
+20. [`docs/ai/governance/agent-failure-learning.md`](./docs/ai/governance/agent-failure-learning.md) when repeated mistakes expose harness gaps
+21. [`docs/ai/document-routing.md`](./docs/ai/document-routing.md) when documentation changes are involved
+22. [`docs/ai/prompts/roles/README.md`](./docs/ai/prompts/roles/README.md)
+23. [`checklists/project-interview.md`](./checklists/project-interview.md) when the repository is still in discovery or bootstrap
+24. [`checklists/agent-role-selection.md`](./checklists/agent-role-selection.md) when multi-agent execution or specialist handoff matters
+25. [`checklists/agent-handoff.md`](./checklists/agent-handoff.md) when work moves between specialized agents
+26. [`checklists/database-change.md`](./checklists/database-change.md) when schema, migration, seed, or data-correction work is involved
+27. [`checklists/agent-failure-review.md`](./checklists/agent-failure-review.md) when a failure case should be reinforced into the harness
 
 ## Non-Negotiables
 
@@ -79,6 +99,9 @@ This file is the canonical AI guidance entrypoint for a project repository templ
 - Do not run destructive DB commands without explicit approval, rollback or backup notes, and verification queries.
 - Do not push without at least one relevant verification step.
 - Install and review local pre-commit hooks before the first shared delivery.
+- Role-heavy changes must explicitly assign an orchestrator, implementation owner, validator, and documentation owner.
+- DB-owning changes must involve `data-steward` responsibilities even if one person or one agent wears multiple hats.
+- Production-significant security changes must include `security-reviewer` output before completion.
 - If an agent failure repeats or exposes a harness gap, record it and reinforce the harness before closing the loop.
 - New repository work must resolve project family, runtime roles, stack, commands, and documentation responsibilities before the first shared delivery.
 
@@ -107,10 +130,12 @@ Read these in order:
 7. [`docs/ai/token-substitution.md`](./docs/ai/token-substitution.md)
 8. [`docs/ai/stack-matrix.md`](./docs/ai/stack-matrix.md)
 9. [`docs/ai/database-rules.md`](./docs/ai/database-rules.md) if the repo owns schema, migration, seed, or query-heavy persistence
-10. [`checklists/project-interview.md`](./checklists/project-interview.md)
-11. [`checklists/project-creation.md`](./checklists/project-creation.md)
-12. [`docs/ai/governance/pre-commit-hooks.md`](./docs/ai/governance/pre-commit-hooks.md)
-13. [`docs/ai/prompts/examples/README.md`](./docs/ai/prompts/examples/README.md)
+10. [`docs/ai/roles/README.md`](./docs/ai/roles/README.md)
+11. [`checklists/project-interview.md`](./checklists/project-interview.md)
+12. [`checklists/agent-role-selection.md`](./checklists/agent-role-selection.md)
+13. [`checklists/project-creation.md`](./checklists/project-creation.md)
+14. [`docs/ai/governance/pre-commit-hooks.md`](./docs/ai/governance/pre-commit-hooks.md)
+15. [`docs/ai/prompts/examples/README.md`](./docs/ai/prompts/examples/README.md)
 
 ## When Docs Must Be Updated
 
@@ -124,6 +149,7 @@ Check [`docs/ai/document-routing.md`](./docs/ai/document-routing.md) when any of
 - validation procedure
 - user-facing workflow
 - incident response or rollback behavior
+- agent role assignment or handoff model
 
 ## Tool Adapters
 
@@ -149,6 +175,7 @@ Use [`docs/ai/prompts/README.md`](./docs/ai/prompts/README.md) for:
 - impact analysis
 - database change review examples
 - project-family bootstrap prompt examples
+- role-specific specialist prompts
 
 ## Quality Gate Reminder
 
@@ -161,3 +188,4 @@ Before completion, confirm:
 - related docs are updated or intentionally deferred with reason
 - schema or data work uses [`docs/ai/database-rules.md`](./docs/ai/database-rules.md) and [`checklists/database-change.md`](./checklists/database-change.md)
 - first-repository work uses [`checklists/first-delivery.md`](./checklists/first-delivery.md) before the first shared delivery
+- specialist-agent flows use [`checklists/agent-role-selection.md`](./checklists/agent-role-selection.md) and [`checklists/agent-handoff.md`](./checklists/agent-handoff.md)

@@ -35,8 +35,9 @@
 1. 프로젝트 bootstrap 인터뷰 계열 프롬프트
 2. 프로젝트 패밀리 또는 런타임 역할별 마스터 프롬프트
 3. 산출물 유형별 프롬프트
-4. 필요 시 저장소 또는 조직 특화 프롬프트
-5. `examples/` 아래 복사형 실행 예시
+4. 역할별 specialist 프롬프트
+5. 필요 시 저장소 또는 조직 특화 프롬프트
+6. `examples/` 아래 복사형 실행 예시
 
 ## 새 프로젝트 시작 시 권장 프롬프트 순서
 
@@ -44,13 +45,14 @@
 2. [`project-spec-finalizer.md`](./project-spec-finalizer.md)로 인터뷰 결과를 정규화된 spec으로 확정한다.
 3. [`scaffold-planning.md`](./scaffold-planning.md)으로 템플릿, 구조, 첫 산출물 계획을 만든다.
 4. [`project-generator-run.md`](./project-generator-run.md)으로 generator 실행 패키지를 정리한다.
-5. 필요한 경우 런타임 역할별 마스터 프롬프트를 추가로 사용한다.
-6. `build-guide.md`를 이용해 첫 로컬 구축 문서를 만든다.
-7. `test-plan.md`로 첫 검증 계획을 만든다.
-8. DB를 소유하는 저장소면 `examples/database-review.md` 또는 `impact-analysis.md`를 사용해 DB change 기준을 확정한다.
-9. 배포가 필요한 저장소면 `deployment-checklist.md`를 만든다.
-10. 운영성 기능이면 `operations-manual.md`와 `impact-analysis.md`를 추가한다.
-11. 실패 케이스가 생기면 `agent-failure-review.md`와 `scripts/record_agent_failure.py`로 환류를 시작한다.
+5. [`../roles/README.md`](../roles/README.md)와 [`roles/README.md`](./roles/README.md), `checklists/agent-role-selection.md`로 역할 세트를 확정한다.
+6. 필요한 경우 런타임 역할별 마스터 프롬프트와 역할별 specialist 프롬프트를 추가로 사용한다.
+7. `build-guide.md`를 이용해 첫 로컬 구축 문서를 만든다.
+8. `test-plan.md`로 첫 검증 계획을 만든다.
+9. DB를 소유하는 저장소면 `examples/database-review.md` 또는 `impact-analysis.md`를 사용해 DB change 기준을 확정한다.
+10. 배포가 필요한 저장소면 `deployment-checklist.md`를 만든다.
+11. 운영성 기능이면 `operations-manual.md`와 `impact-analysis.md`를 추가한다.
+12. 실패 케이스가 생기면 `agent-failure-review.md`와 `scripts/record_agent_failure.py`로 환류를 시작한다.
 
 ## 프로젝트 생성 프롬프트
 
@@ -65,6 +67,21 @@
 - [`api.md`](./api.md)
 - [`batch.md`](./batch.md)
 - [`receiver.md`](./receiver.md)
+
+## 역할별 specialist 프롬프트
+
+- [`roles/README.md`](./roles/README.md)
+- [`roles/orchestrator.md`](./roles/orchestrator.md)
+- [`roles/product-analyst.md`](./roles/product-analyst.md)
+- [`roles/solution-architect.md`](./roles/solution-architect.md)
+- [`roles/bootstrap-planner.md`](./roles/bootstrap-planner.md)
+- [`roles/runtime-engineer.md`](./roles/runtime-engineer.md)
+- [`roles/data-steward.md`](./roles/data-steward.md)
+- [`roles/security-reviewer.md`](./roles/security-reviewer.md)
+- [`roles/qa-validator.md`](./roles/qa-validator.md)
+- [`roles/docs-operator.md`](./roles/docs-operator.md)
+- [`roles/release-manager.md`](./roles/release-manager.md)
+- [`roles/failure-curator.md`](./roles/failure-curator.md)
 
 ## 산출물 유형별 프롬프트
 

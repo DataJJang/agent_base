@@ -49,6 +49,29 @@
 - `runtimeRole`에 `receiver`가 있으면 `services/receiver.md`를 읽고 ingress, parser, publish, diagnostics 기준을 추가한다.
 - `runtimeRole`에 `frontend`가 있으면 `services/frontend.md`를 읽고 route, state, i18n, UI smoke 기준을 추가한다.
 
+## 4.1 프로젝트 패밀리별 추천 agent 역할
+
+| projectFamily | 필수 역할 | 선택 역할 |
+| --- | --- | --- |
+| `game` | `orchestrator`, `product-analyst`, `bootstrap-planner`, `runtime-engineer[game]`, `qa-validator`, `docs-operator` | `solution-architect`, `release-manager`, `failure-curator` |
+| `web-app` | `orchestrator`, `product-analyst`, `bootstrap-planner`, `runtime-engineer[frontend]`, `qa-validator`, `docs-operator` | `solution-architect`, `security-reviewer`, `release-manager`, `failure-curator` |
+| `pwa` | `orchestrator`, `product-analyst`, `bootstrap-planner`, `runtime-engineer[frontend]`, `security-reviewer`, `qa-validator`, `docs-operator` | `solution-architect`, `release-manager`, `failure-curator` |
+| `mobile-app` | `orchestrator`, `product-analyst`, `runtime-engineer[mobile]`, `qa-validator`, `docs-operator` | `security-reviewer`, `release-manager`, `failure-curator` |
+| `backend-service` | `orchestrator`, `product-analyst`, `solution-architect`, `bootstrap-planner`, `runtime-engineer[api]`, `data-steward`, `security-reviewer`, `qa-validator`, `docs-operator` | `release-manager`, `failure-curator` |
+| `batch-worker` | `orchestrator`, `solution-architect`, `runtime-engineer[batch]`, `data-steward`, `qa-validator`, `docs-operator` | `security-reviewer`, `release-manager`, `failure-curator` |
+| `receiver-integration` | `orchestrator`, `solution-architect`, `runtime-engineer[receiver]`, `data-steward`, `security-reviewer`, `qa-validator`, `docs-operator` | `release-manager`, `failure-curator` |
+| `mockup-local` | `orchestrator`, `bootstrap-planner`, `runtime-engineer[frontend or game]`, `docs-operator` | `qa-validator`, `failure-curator` |
+| `library-tooling` | `orchestrator`, `runtime-engineer[tooling]`, `qa-validator`, `docs-operator` | `solution-architect`, `failure-curator` |
+
+## 4.2 역할 매핑 규칙
+
+- `orchestrator`는 multi-agent 흐름이면 항상 필요하다.
+- DB schema, migration, seed, data correction을 소유하면 `data-steward`를 필수로 둔다.
+- 인증, 권한, 보안 설정, 외부 공개 API, production 배포가 있으면 `security-reviewer`를 필수로 둔다.
+- 실제 공유 전달이나 운영 영향이 있는 변경이면 `docs-operator`와 `qa-validator`를 필수로 둔다.
+- 배포 순서, 롤백, 운영 점검이 중요하면 `release-manager`를 추가한다.
+- 반복 실패가 있거나 harness 강화를 병행해야 하면 `failure-curator`를 추가한다.
+
 ## 5. 문서 세트 확장 규칙
 
 - `datastore != 없음`이면 `database-rules.md`와 `checklists/database-change.md`를 포함한다.
