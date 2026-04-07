@@ -22,3 +22,8 @@
 - [`docs-operator.md`](./docs-operator.md)
 - [`release-manager.md`](./release-manager.md)
 - [`failure-curator.md`](./failure-curator.md)
+- [`legacy-analyst.md`](./legacy-analyst.md)
+- [`migration-planner.md`](./migration-planner.md)
+- [`compatibility-reviewer.md`](./compatibility-reviewer.md)
+- [`refactor-guardian.md`](./refactor-guardian.md)
+- [`cutover-manager.md`](./cutover-manager.md)

@@ -24,6 +24,11 @@
 | `docs-operator` | README, runbook, manual, checklist 갱신 | 운영/배포/사용 흐름 영향이 있는 작업 |
 | `release-manager` | rollout, rollback, 배포 점검 | 배포/운영 영향이 큰 작업 |
 | `failure-curator` | 실패 수집과 harness 강화 | 반복 실패, 규약 갭 발견 |
+| `legacy-analyst` | 기존 저장소 구조, 명령, 제약, docs gap 파악 | brownfield onboarding |
+| `migration-planner` | 전환 단계, parity, cutover 순서 정의 | migration, replatform |
+| `compatibility-reviewer` | 현재/목표 스택 호환성, breaking point 검토 | framework upgrade, stack migration |
+| `refactor-guardian` | 구조 정리 중 behavior drift 통제 | large refactor, modularization |
+| `cutover-manager` | cutover, rollback, 운영 점검 실행 기준 관리 | phased rollout, shadow, cutover |
 
 ## Runtime Engineer Specializations
 

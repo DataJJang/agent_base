@@ -16,14 +16,28 @@
   - 테이블, 컬럼, 약어, constraint, COMMENT, migration, 위험 SQL 기준
 - [`project-bootstrap.md`](./project-bootstrap.md)
   - 새 저장소를 대화형 인터뷰로 어떻게 생성하고 첫 프롬프트를 어떻게 실행할지 정의
+- [`project-adoption.md`](./project-adoption.md)
+  - 기존 저장소를 inventory, adoption spec, migration plan으로 온보딩하는 절차 정의
 - [`project-bootstrap-cli.md`](./project-bootstrap-cli.md)
   - 대화형 인터뷰를 실제 CLI로 실행해 spec 저장과 generator 호출까지 묶는 방법 정의
 - [`project-generation-spec.md`](./project-generation-spec.md)
   - 새 저장소 생성 시 반드시 채워야 할 정규화 입력값과 산출 구조 정의
+- [`adoption-spec.md`](./adoption-spec.md)
+  - 기존 저장소 adoption/migration 시 채워야 할 정규화 입력값 정의
 - [`project-family-map.md`](./project-family-map.md)
   - 프로젝트 패밀리와 하위 런타임 역할의 관계 정의
 - [`project-selection-mapping.md`](./project-selection-mapping.md)
   - 선택값이 어떤 템플릿, 문서, 명령, 초기 산출물로 이어지는지 정의
+- [`repository-inventory.md`](./repository-inventory.md)
+  - 기존 저장소에서 먼저 추출해야 하는 사실, 명령, 위험 요소 정의
+- [`migration-strategy.md`](./migration-strategy.md)
+  - phased, shadow, dual-run, big-bang 같은 전환 전략 선택 기준 정의
+- [`compatibility-matrix.md`](./compatibility-matrix.md)
+  - 현재 스택과 목표 스택의 호환성, 예외, breaking point 정리
+- [`legacy-exception-policy.md`](./legacy-exception-policy.md)
+  - 당장 못 바꾸는 legacy 예외를 문서화하고 만료시키는 기준 정의
+- [`parity-validation.md`](./parity-validation.md)
+  - 기존 동작과 새 구조의 기능/계약/데이터 동등성 검증 기준 정의
 - [`roles/README.md`](./roles/README.md)
   - agentic engineering에서 쓰는 역할군, 책임, handoff 기준 정의
 - [`project-generator.md`](./project-generator.md)
@@ -50,6 +64,10 @@
   - 실패 케이스 수집, 재발 방지, harness 강화 환류 기준
 - `scripts/record_agent_failure.py`
   - 실패 케이스를 `.agent-base/failure-cases/`에 JSON/Markdown으로 적재하는 helper
+- `scripts/analyze_repository.py`
+  - 기존 저장소에서 build/test/config/docs/runtime inventory를 추출하는 helper
+- `scripts/summarize_failures.py`
+  - failure-cases를 집계해 반복 실패 패턴을 요약하는 helper
 - [`governance/release-and-rollback.md`](./governance/release-and-rollback.md)
   - 배포/롤백 상세 판단 기준
 - [`governance/evaluation-and-drift.md`](./governance/evaluation-and-drift.md)
@@ -83,22 +101,24 @@
 2. `docs/ai/project-bootstrap.md`
 3. `docs/ai/project-bootstrap-cli.md`
 4. `docs/ai/project-generation-spec.md`
-5. `docs/ai/project-family-map.md`
-6. `docs/ai/project-selection-mapping.md`
-7. `docs/ai/roles/README.md`
-8. `docs/ai/project-generator.md`
-9. `docs/ai/token-substitution.md`
-10. `docs/ai/stack-matrix.md`
-11. `docs/ai/architecture-map.md`
-12. `docs/ai/core-rules.md`
-13. 필요 시 `docs/ai/database-rules.md`
-14. `docs/ai/lifecycle.md`
-15. 런타임 역할별 상세 규칙
-16. `docs/ai/governance/quality-gates.md`
-17. `docs/ai/governance/pre-commit-hooks.md`
-18. 필요 시 `docs/ai/governance/agent-failure-learning.md`
-19. 필요 시 `docs/ai/prompts/roles/*`
-20. 필요 시 `docs/ai/document-routing.md`, `docs/ai/prompts/*`, `checklists/*`
+5. 필요 시 `docs/ai/project-adoption.md`, `docs/ai/adoption-spec.md`
+6. `docs/ai/project-family-map.md`
+7. `docs/ai/project-selection-mapping.md`
+8. `docs/ai/roles/README.md`
+9. `docs/ai/project-generator.md`
+10. `docs/ai/token-substitution.md`
+11. `docs/ai/stack-matrix.md`
+12. `docs/ai/architecture-map.md`
+13. `docs/ai/core-rules.md`
+14. 필요 시 `docs/ai/database-rules.md`
+15. `docs/ai/lifecycle.md`
+16. brownfield면 `docs/ai/repository-inventory.md`, `docs/ai/migration-strategy.md`, `docs/ai/parity-validation.md`
+17. 런타임 역할별 상세 규칙
+18. `docs/ai/governance/quality-gates.md`
+19. `docs/ai/governance/pre-commit-hooks.md`
+20. 필요 시 `docs/ai/governance/agent-failure-learning.md`
+21. 필요 시 `docs/ai/prompts/roles/*`
+22. 필요 시 `docs/ai/document-routing.md`, `docs/ai/prompts/*`, `checklists/*`
 
 ## 기본 원칙
 

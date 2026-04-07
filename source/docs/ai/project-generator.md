@@ -11,7 +11,7 @@
 - 생성기는 `projectFamily`에 맞는 템플릿을 복사한다.
 - 지원되는 언어/프레임워크 조합이면 scaffold를 추가 생성한다.
 - 토큰 치환 규칙에 따라 프로젝트 메타데이터를 실제 값으로 바꾼다.
-- 결과 저장소에는 생성 당시 spec과 manifest를 같이 남긴다.
+- 결과 저장소에는 생성 당시 spec, manifest, agent role plan을 같이 남긴다.
 
 ## 3. 권장 CLI 인터뷰 실행
 
@@ -87,6 +87,7 @@ python3 source/scripts/generate_project.py \
 - root `README.md`
 - `.agent-base/project-generation-spec.json`
 - `.agent-base/generation-manifest.json`
+- `.agent-base/agent-role-plan.json`
 - 필요 시 `TODO_UNSUPPORTED_SCAFFOLD.md`
 
 ## 7. 후속 작업

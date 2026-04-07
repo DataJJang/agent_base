@@ -67,12 +67,13 @@ CLI는 아래 순서로 질문한다.
 CLI는 아래를 만든다.
 
 - 정규화된 spec JSON
+- 자동 파생된 `requiredAgentRoles`, `optionalAgentRoles`, `roleSpecializations`, `agentWorkflowOrder`
 - 선택된 template 이름
 - 선택된 scaffold profile 이름
 - 생성 지원 수준
 - 필요 시 실제 샘플 저장소
 
-spec은 `.agent-base/project-generation-spec.json`으로도 생성 저장소 안에 다시 남는다.
+spec은 `.agent-base/project-generation-spec.json`으로도 생성 저장소 안에 다시 남고, generator는 `.agent-base/agent-role-plan.json`을 같이 만든다.
 
 ## 6. 주의사항
 

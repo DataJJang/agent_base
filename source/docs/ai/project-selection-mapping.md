@@ -9,6 +9,7 @@
 - `projectFamily`가 최상위 템플릿 선택 기준이다.
 - 생성기는 `projectFamily`로 기본 템플릿을 고르고, 언어/프레임워크 조합으로 scaffold profile을 고른다.
 - `runtimeRole[]`는 서비스 규칙 문서와 추가 템플릿 오버레이 선택 기준이다.
+- `runtimeRole[]`와 `projectFamily`는 required/optional agent 역할과 specialization을 자동 파생하는 기준이다.
 - `repositoryMode`는 생성기 출력의 한계와 후속 오버레이 범위를 결정한다.
 - `projectNature`, `deploymentType`, `datastore`, `cache`는 생성해야 할 문서 종류를 제한하거나 확장한다.
 - `production` 또는 외부 사용자 대상이면 운영/배포/보안 문서는 필수다.
@@ -66,6 +67,7 @@
 ## 4.2 역할 매핑 규칙
 
 - `orchestrator`는 multi-agent 흐름이면 항상 필요하다.
+- bootstrap CLI와 generator는 이 문서의 패밀리별 매핑을 기준으로 `requiredAgentRoles`, `optionalAgentRoles`, `roleSpecializations`, `agentWorkflowOrder`를 자동 보정한다.
 - DB schema, migration, seed, data correction을 소유하면 `data-steward`를 필수로 둔다.
 - 인증, 권한, 보안 설정, 외부 공개 API, production 배포가 있으면 `security-reviewer`를 필수로 둔다.
 - 실제 공유 전달이나 운영 영향이 있는 변경이면 `docs-operator`와 `qa-validator`를 필수로 둔다.
@@ -92,3 +94,9 @@
   - `.agent-base/generation-manifest.json`
   - family-appropriate scaffold files
 - 지원되지 않는 스택 조합이면 docs template만 생성하고 `TODO_UNSUPPORTED_SCAFFOLD.md`를 남긴다.
+
+## 7. Brownfield / Adoption 연결 규칙
+
+- 기존 저장소는 generator보다 `project-adoption`, `adoption-spec`, `repository-inventory`를 먼저 사용한다.
+- brownfield에서는 `legacy-analyst`, `migration-planner`, `compatibility-reviewer`를 우선 검토한다.
+- cutover 또는 구조 분리가 있으면 `refactor-guardian`, `cutover-manager`를 추가한다.

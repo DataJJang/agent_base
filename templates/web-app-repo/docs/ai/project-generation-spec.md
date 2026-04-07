@@ -42,7 +42,7 @@
 
 ## 2-1. 파생 coordination 필드
 
-아래 필드는 generator v1의 필수 입력은 아니지만, agentic engineering 흐름에서는 같이 정리하는 것을 권장한다.
+아래 필드는 bootstrap CLI와 generator가 자동으로 파생하거나 보정한다. 수동 spec를 쓸 때도 비워 두지 않는 것을 권장한다.
 
 | 항목 | JSON key | 설명 |
 | --- | --- | --- |
@@ -51,6 +51,14 @@
 | 역할별 specialization | `roleSpecializations` | `runtime-engineer: game` 같은 specialization |
 | handoff 순서 | `agentWorkflowOrder` | orchestrator부터 validator까지의 기본 순서 |
 | 역할 override | `agentRoleOverrides` | 저장소별 예외 역할 정의 |
+
+자동 파생 규칙:
+
+- `projectFamily`, `runtimeRoles`, `projectNature`, `datastore`, `schemaOwnership`, `securityProfile`, `deploymentType`를 기준으로 role set을 추천한다.
+- DB를 소유하면 `data-steward`를 필수로 올린다.
+- `production` 또는 인증/인가가 있으면 `security-reviewer`를 필수로 올린다.
+- `deploymentType != local-only`이면 `release-manager`를 기본 optional로 올린다.
+- `runtimeRoles`에 따라 `runtime-engineer:*` specialization을 자동으로 붙인다.
 
 ## 2-2. 생성기 입력 예시
 
@@ -92,6 +100,16 @@
   "agentRoleOverrides": []
 }
 ```
+
+## 2-3. 실행형 산출물
+
+generator는 spec를 받아 아래 산출물을 같이 남긴다.
+
+- `.agent-base/project-generation-spec.json`
+- `.agent-base/generation-manifest.json`
+- `.agent-base/agent-role-plan.json`
+
+`agent-role-plan.json`에는 필수 역할, 선택 역할, specialization, workflow order가 들어가며 multi-agent handoff의 기본 기준점으로 쓴다.
 
 ## 3. 프로젝트 패밀리별 필수 산출 구조
 

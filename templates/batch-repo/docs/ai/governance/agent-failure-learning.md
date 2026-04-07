@@ -33,6 +33,9 @@
   - scaffold 부족
   - validation 부족
   - 도구 한계
+  - migration regression
+  - compatibility miss
+  - cutover miss
 - 재현 방법
 - root cause
 - 고쳐야 할 위치
@@ -72,6 +75,7 @@
 
 - 기본 저장 위치: `.agent-base/failure-cases/`
 - 기본 기록 스크립트: `python3 scripts/record_agent_failure.py`
+- 반복 실패 집계 스크립트: `python3 scripts/summarize_failures.py`
 
 예시:
 
@@ -101,3 +105,4 @@ python3 scripts/record_agent_failure.py \
 - 실패 발생 즉시 triage
 - 주간 또는 스프린트 단위로 반복 실패 묶음 정리
 - 분기별로 실패 패턴을 다시 분류해 공통 규칙에 승격할지 검토
+- migration/adoption 실패는 bootstrap 실패와 분리해 보고, `compatibility`, `parity`, `cutover`, `rollback` 문서를 같이 보강한다

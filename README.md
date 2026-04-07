@@ -6,11 +6,13 @@
 
 - 대화형 프로젝트 bootstrap 인터뷰
 - 정규화된 project generation spec
+- 기존 저장소 inventory와 adoption spec
 - 프로젝트 패밀리와 runtime role 기준의 템플릿 선택 규칙
 - 샘플 저장소 generator와 scaffold
 - 저장 전 자동 검사를 위한 pre-commit hook pack
 - 실패 기록과 harness 강화 환류 루프
 - 역할 기반 agentic engineering 문서와 역할별 prompt library
+- brownfield migration, compatibility, parity, cutover 기준
 
 ## 무엇을 할 수 있나
 
@@ -19,6 +21,7 @@
 - 지원되는 언어/프레임워크 조합이면 최소 실행 가능한 샘플 저장소를 별도 디렉토리에 생성한다.
 - 생성된 저장소 안에 `AGENTS.md`, `docs/ai/*`, 체크리스트, prompt 예시, pre-commit 설정을 같이 넣어 첫 build/test/문서화까지 이어갈 수 있게 한다.
 - 필요하면 `orchestrator`, `runtime-engineer`, `data-steward`, `security-reviewer`, `qa-validator`, `docs-operator` 같은 역할로 Agent를 나눠 agentic workflow를 설계할 수 있다.
+- 기존 저장소에는 `legacy-analyst`, `migration-planner`, `compatibility-reviewer`, `cutover-manager` 역할을 추가해 adoption/migration 흐름을 설계할 수 있다.
 
 ## 이 패키지의 핵심 개념
 
@@ -55,6 +58,11 @@
 - `docs-operator`
 - `release-manager`
 - `failure-curator`
+- `legacy-analyst`
+- `migration-planner`
+- `compatibility-reviewer`
+- `refactor-guardian`
+- `cutover-manager`
 
 역할별 책임과 handoff 규칙은 [`source/docs/ai/roles/README.md`](./source/docs/ai/roles/README.md) 에 정리돼 있다.
 
@@ -73,12 +81,15 @@
 
 1. [`source/AGENTS.md`](./source/AGENTS.md)를 읽는다.
 2. [`source/docs/ai/project-bootstrap.md`](./source/docs/ai/project-bootstrap.md)로 인터뷰 절차를 따른다.
+2-1. 기존 저장소라면 [`source/docs/ai/project-adoption.md`](./source/docs/ai/project-adoption.md)부터 읽는다.
 3. 가능하면 [`source/docs/ai/project-bootstrap-cli.md`](./source/docs/ai/project-bootstrap-cli.md)와 `source/scripts/project_bootstrap_cli.py`로 인터뷰와 spec 생성을 한 번에 수행한다.
 4. [`source/docs/ai/project-generation-spec.md`](./source/docs/ai/project-generation-spec.md)로 생성 spec을 검토한다.
+4-1. 기존 저장소라면 `source/scripts/analyze_repository.py`와 [`source/docs/ai/adoption-spec.md`](./source/docs/ai/adoption-spec.md)로 현재 상태를 inventory/spec으로 정리한다.
 5. [`source/docs/ai/project-family-map.md`](./source/docs/ai/project-family-map.md)과 [`source/docs/ai/project-selection-mapping.md`](./source/docs/ai/project-selection-mapping.md)으로 템플릿, runtime role, 추천 agent 역할 세트를 정한다.
 6. [`source/docs/ai/roles/README.md`](./source/docs/ai/roles/README.md)와 [`source/checklists/agent-role-selection.md`](./source/checklists/agent-role-selection.md)로 역할과 handoff 책임을 정한다.
 7. [`source/docs/ai/stack-matrix.md`](./source/docs/ai/stack-matrix.md), [`source/docs/ai/database-rules.md`](./source/docs/ai/database-rules.md)를 기준으로 기술 스택과 DB 기준을 확정한다.
 8. [`source/docs/ai/project-generator.md`](./source/docs/ai/project-generator.md)와 [`source/docs/ai/token-substitution.md`](./source/docs/ai/token-substitution.md)를 읽고 generator를 실행한다.
+8-1. generator는 `.agent-base/agent-role-plan.json`을 같이 만들어 required/optional 역할과 workflow order를 남긴다.
 9. 생성된 샘플 저장소 안에서 `python3 scripts/install_git_hooks.py`를 실행한다.
 10. 생성된 샘플 저장소 안에서 `.agent-base/pre-commit-config.json`의 preset profile을 실제 명령 체계에 맞게 보정한다.
 11. 생성된 샘플 저장소 안에서 `command-catalog`, `architecture-map`, `project-creation`, `first-delivery`를 실제 프로젝트에 맞게 보정한다.
@@ -145,6 +156,7 @@ python3 ./source/scripts/project_bootstrap_cli.py \
 - `.agent-base/project-generation-spec.json`
 - `.agent-base/generation-manifest.json`
 - `.agent-base/pre-commit-config.json`
+- `.agent-base/agent-role-plan.json`
 - `.githooks/*`
 - `checklists/project-creation.md`
 - `checklists/first-delivery.md`
