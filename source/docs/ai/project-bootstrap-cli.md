@@ -73,7 +73,7 @@ CLI는 아래를 만든다.
 - 생성 지원 수준
 - 필요 시 실제 샘플 저장소
 
-spec은 `.agent-base/project-generation-spec.json`으로도 생성 저장소 안에 다시 남고, generator는 `.agent-base/agent-role-plan.json`을 같이 만든다.
+spec은 `.agent-base/project-generation-spec.json`으로도 생성 저장소 안에 다시 남고, generator는 `.agent-base/context-manifest.json`, `.agent-base/agent-role-plan.json`을 같이 만든다.
 
 ## 6. 주의사항
 

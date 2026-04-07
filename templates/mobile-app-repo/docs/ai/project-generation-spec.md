@@ -94,10 +94,10 @@
   "migrationPath": "db/migration",
   "baseDocumentSet": ["README", "deployment-checklist", "test-plan"],
   "exceptions": [],
-  "requiredAgentRoles": ["orchestrator", "runtime-engineer", "qa-validator", "docs-operator"],
-  "optionalAgentRoles": ["data-steward", "security-reviewer", "release-manager"],
+  "requiredAgentRoles": ["orchestrator", "bootstrap-planner", "runtime-engineer", "data-steward", "security-reviewer", "qa-validator", "docs-operator"],
+  "optionalAgentRoles": ["product-analyst", "solution-architect", "release-manager", "failure-curator"],
   "roleSpecializations": ["runtime-engineer: api"],
-  "agentWorkflowOrder": ["orchestrator", "solution-architect", "runtime-engineer", "qa-validator", "docs-operator"],
+  "agentWorkflowOrder": ["orchestrator", "bootstrap-planner", "runtime-engineer", "data-steward", "security-reviewer", "qa-validator", "docs-operator", "product-analyst", "solution-architect", "release-manager", "failure-curator"],
   "agentRoleOverrides": []
 }
 ```
@@ -108,8 +108,10 @@ generator는 spec를 받아 아래 산출물을 같이 남긴다.
 
 - `.agent-base/project-generation-spec.json`
 - `.agent-base/generation-manifest.json`
+- `.agent-base/context-manifest.json`
 - `.agent-base/agent-role-plan.json`
 
+`context-manifest.json`에는 fast path, deep path, core roles, extended roles, context budget이 들어간다.
 `agent-role-plan.json`에는 필수 역할, 선택 역할, specialization, workflow order가 들어가며 multi-agent handoff의 기본 기준점으로 쓴다.
 
 ## 3. 프로젝트 패밀리별 필수 산출 구조

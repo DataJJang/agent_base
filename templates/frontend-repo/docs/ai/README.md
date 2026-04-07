@@ -69,6 +69,7 @@
 ### Tools / Examples
 
 - [`project-generator.md`](./project-generator.md)
+- [`context-manifest.md`](./context-manifest.md)
 - [`token-substitution.md`](./token-substitution.md)
 - [`tools/compatibility.md`](./tools/compatibility.md)
 - [`tools/windsurf.md`](./tools/windsurf.md)

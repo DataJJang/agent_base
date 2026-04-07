@@ -19,6 +19,13 @@
 ## 3. 실패 케이스 기록 항목
 
 - 저장소명 / 브랜치
+- 작업 모드
+  - `bootstrap`
+  - `adoption`
+  - `delivery`
+  - `incident`
+- workflow stage
+  - `interview`, `spec`, `mapping`, `generation`, `implementation`, `handoff`, `validation`, `rollout`
 - agent 역할
 - upstream 역할 / downstream 역할
 - 작업 요청 요약
@@ -38,6 +45,14 @@
   - cutover miss
 - 재현 방법
 - root cause
+- root cause layer
+  - `docs`
+  - `prompts`
+  - `templates`
+  - `scripts`
+  - `checklists`
+  - `tools`
+  - `role-assignment`
 - 고쳐야 할 위치
   - `AGENTS.md`
   - `docs/ai/*`
@@ -76,17 +91,23 @@
 - 기본 저장 위치: `.agent-base/failure-cases/`
 - 기본 기록 스크립트: `python3 scripts/record_agent_failure.py`
 - 반복 실패 집계 스크립트: `python3 scripts/summarize_failures.py`
+- 집계 결과는 `failureTypes`, `agentRoles`뿐 아니라 `modes`, `workflowStages`, `rootCauseLayers`, `affectedAreas`까지 본다.
 
 예시:
 
 ```bash
 python3 scripts/record_agent_failure.py \
   --summary "wrong template selected during bootstrap" \
+  --mode bootstrap \
+  --workflow-stage mapping \
+  --agent-role orchestrator \
   --request "create a backend service project" \
   --expected "backend-service template should be selected" \
   --actual "web-app template was selected" \
   --failure-type template \
   --failure-type prompt \
+  --root-cause-layer prompts \
+  --root-cause-layer scripts \
   --affected-area docs/ai/project-selection-mapping.md \
   --affected-area docs/ai/prompts/examples/project-bootstrap.md \
   --validation "rerun bootstrap with the same input and confirm backend-service mapping"

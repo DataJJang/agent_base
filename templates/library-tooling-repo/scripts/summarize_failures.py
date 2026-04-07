@@ -19,6 +19,10 @@ def main() -> int:
     failure_dir = root / ".agent-base" / "failure-cases"
     failure_types: Counter[str] = Counter()
     roles: Counter[str] = Counter()
+    modes: Counter[str] = Counter()
+    workflow_stages: Counter[str] = Counter()
+    root_cause_layers: Counter[str] = Counter()
+    affected_areas: Counter[str] = Counter()
     total = 0
 
     if failure_dir.exists():
@@ -34,12 +38,26 @@ def main() -> int:
             role = payload.get("agentRole")
             if role:
                 roles[role] += 1
+            mode = payload.get("mode")
+            if mode:
+                modes[mode] += 1
+            workflow_stage = payload.get("workflowStage")
+            if workflow_stage:
+                workflow_stages[workflow_stage] += 1
+            for item in payload.get("rootCauseLayers", []):
+                root_cause_layers[item] += 1
+            for item in payload.get("affectedAreas", []):
+                affected_areas[item] += 1
 
     summary = {
         "failureDirectory": str(failure_dir),
         "totalCases": total,
         "failureTypes": failure_types.most_common(),
         "agentRoles": roles.most_common(),
+        "modes": modes.most_common(),
+        "workflowStages": workflow_stages.most_common(),
+        "rootCauseLayers": root_cause_layers.most_common(),
+        "affectedAreas": affected_areas.most_common(),
     }
     print(json.dumps(summary, indent=2, ensure_ascii=False))
     return 0

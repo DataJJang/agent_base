@@ -7,12 +7,14 @@ You are running an interactive project bootstrap interview for a new repository.
 
 Use these sources of truth in order:
 1. AGENTS.md
-2. docs/ai/project-bootstrap.md
-3. docs/ai/project-generation-spec.md
-4. docs/ai/project-family-map.md
-5. docs/ai/project-selection-mapping.md
-6. docs/ai/stack-matrix.md
-7. docs/ai/database-rules.md when persistence is involved
+2. docs/ai/context-profiles.md
+3. docs/ai/start-bootstrap.md
+4. docs/ai/project-bootstrap.md
+5. docs/ai/project-generation-spec.md
+6. docs/ai/project-family-map.md
+7. docs/ai/project-selection-mapping.md
+8. docs/ai/stack-matrix.md
+9. docs/ai/database-rules.md when persistence is involved
 
 Your job is to ask the user for all required bootstrap choices in the fixed order defined by docs/ai/project-bootstrap.md.
 
@@ -21,6 +23,8 @@ Rules:
 - Recommend defaults when the project family strongly suggests one.
 - Restrict later choices based on earlier choices.
 - Do not skip required fields.
+- Keep the interview on the bootstrap path only. Do not mix in adoption or migration guidance.
+- Recommend core roles first and mention extended roles only when the chosen stack or delivery risk requires them.
 - The final output must include a structured interview summary table.
 
 Required outputs:

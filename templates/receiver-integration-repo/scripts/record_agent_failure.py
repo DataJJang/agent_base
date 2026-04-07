@@ -21,8 +21,19 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--request", help="Original user request")
     parser.add_argument("--expected", help="Expected result")
     parser.add_argument("--actual", help="Actual result")
+    parser.add_argument("--mode", choices=["bootstrap", "adoption", "delivery", "incident"], help="Workflow mode")
+    parser.add_argument("--workflow-stage", help="Stage such as interview, spec, mapping, generation, handoff, validation, rollout")
+    parser.add_argument("--agent-role", help="Primary agent role at failure time")
+    parser.add_argument("--upstream-role", help="Upstream role that handed work into the failed step")
+    parser.add_argument("--downstream-role", help="Downstream role affected by the failed step")
     parser.add_argument("--failure-type", action="append", default=[], help="Failure type classification")
     parser.add_argument("--root-cause", help="Root cause summary")
+    parser.add_argument(
+        "--root-cause-layer",
+        action="append",
+        default=[],
+        help="Harness layer such as docs, prompts, templates, scripts, checklists, tools, role-assignment",
+    )
     parser.add_argument("--affected-area", action="append", default=[], help="Harness area to reinforce")
     parser.add_argument("--validation", help="Validation plan or verification result")
     parser.add_argument("--follow-up", action="append", default=[], help="Follow-up items")
@@ -65,6 +76,11 @@ def render_markdown(payload: dict) -> str:
         f"- Timestamp: `{payload['timestamp']}`",
         f"- Repository: `{payload['repository']}`",
         f"- Branch: `{payload['branch']}`",
+        f"- Mode: `{payload['mode'] or '-'}`",
+        f"- Workflow stage: `{payload['workflowStage'] or '-'}`",
+        f"- Agent role: `{payload['agentRole'] or '-'}`",
+        f"- Upstream role: `{payload['upstreamRole'] or '-'}`",
+        f"- Downstream role: `{payload['downstreamRole'] or '-'}`",
         "",
         "## Request",
         "",
@@ -91,6 +107,17 @@ def render_markdown(payload: dict) -> str:
             "## Root Cause",
             "",
             payload["rootCause"] or "-",
+            "",
+            "## Root Cause Layers",
+            "",
+        ]
+    )
+    if payload["rootCauseLayers"]:
+        lines.extend([f"- {item}" for item in payload["rootCauseLayers"]])
+    else:
+        lines.append("- -")
+    lines.extend(
+        [
             "",
             "## Affected Harness Areas",
             "",
@@ -131,6 +158,17 @@ def main() -> int:
     request = ask("Original request", args.request or "") if interactive else (args.request or "")
     expected = ask("Expected result", args.expected or "") if interactive else (args.expected or "")
     actual = ask("Actual result", args.actual or "") if interactive else (args.actual or "")
+    mode = ask("Mode", args.mode or "", allow_blank=True) if interactive else (args.mode or "")
+    workflow_stage = (
+        ask("Workflow stage", args.workflow_stage or "", allow_blank=True) if interactive else (args.workflow_stage or "")
+    )
+    agent_role = ask("Agent role", args.agent_role or "", allow_blank=True) if interactive else (args.agent_role or "")
+    upstream_role = (
+        ask("Upstream role", args.upstream_role or "", allow_blank=True) if interactive else (args.upstream_role or "")
+    )
+    downstream_role = (
+        ask("Downstream role", args.downstream_role or "", allow_blank=True) if interactive else (args.downstream_role or "")
+    )
     root_cause = ask("Root cause", args.root_cause or "", allow_blank=True) if interactive else (args.root_cause or "")
     validation = ask("Validation", args.validation or "", allow_blank=True) if interactive else (args.validation or "")
 
@@ -148,8 +186,14 @@ def main() -> int:
         "request": request,
         "expected": expected,
         "actual": actual,
+        "mode": mode,
+        "workflowStage": workflow_stage,
+        "agentRole": agent_role,
+        "upstreamRole": upstream_role,
+        "downstreamRole": downstream_role,
         "failureTypes": args.failure_type,
         "rootCause": root_cause,
+        "rootCauseLayers": args.root_cause_layer,
         "affectedAreas": args.affected_area,
         "validation": validation,
         "followUpItems": args.follow_up,

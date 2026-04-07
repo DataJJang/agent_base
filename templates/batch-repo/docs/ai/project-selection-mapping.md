@@ -93,6 +93,8 @@
   - root `README.md`
   - `.agent-base/project-generation-spec.json`
   - `.agent-base/generation-manifest.json`
+  - `.agent-base/context-manifest.json`
+  - `.agent-base/agent-role-plan.json`
   - family-appropriate scaffold files
 - 지원되지 않는 스택 조합이면 docs template만 생성하고 `TODO_UNSUPPORTED_SCAFFOLD.md`를 남긴다.
 

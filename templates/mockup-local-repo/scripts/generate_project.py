@@ -63,30 +63,28 @@ DEFAULT_PRECOMMIT_CONFIG = {
 
 ROLE_BASELINE_BY_FAMILY = {
     "game": {
-        "required": ["orchestrator", "product-analyst", "bootstrap-planner", "runtime-engineer", "qa-validator", "docs-operator"],
-        "optional": ["solution-architect", "release-manager", "failure-curator"],
+        "required": ["orchestrator", "bootstrap-planner", "runtime-engineer", "qa-validator", "docs-operator"],
+        "optional": ["product-analyst", "solution-architect", "release-manager", "failure-curator"],
         "specializations": ["runtime-engineer: game"],
     },
     "web-app": {
-        "required": ["orchestrator", "product-analyst", "bootstrap-planner", "runtime-engineer", "qa-validator", "docs-operator"],
-        "optional": ["solution-architect", "security-reviewer", "release-manager", "failure-curator"],
+        "required": ["orchestrator", "bootstrap-planner", "runtime-engineer", "qa-validator", "docs-operator"],
+        "optional": ["product-analyst", "solution-architect", "security-reviewer", "release-manager", "failure-curator"],
         "specializations": ["runtime-engineer: frontend"],
     },
     "pwa": {
-        "required": ["orchestrator", "product-analyst", "bootstrap-planner", "runtime-engineer", "security-reviewer", "qa-validator", "docs-operator"],
-        "optional": ["solution-architect", "release-manager", "failure-curator"],
+        "required": ["orchestrator", "bootstrap-planner", "runtime-engineer", "security-reviewer", "qa-validator", "docs-operator"],
+        "optional": ["product-analyst", "solution-architect", "release-manager", "failure-curator"],
         "specializations": ["runtime-engineer: frontend"],
     },
     "mobile-app": {
-        "required": ["orchestrator", "product-analyst", "runtime-engineer", "qa-validator", "docs-operator"],
-        "optional": ["security-reviewer", "release-manager", "failure-curator"],
+        "required": ["orchestrator", "runtime-engineer", "qa-validator", "docs-operator"],
+        "optional": ["product-analyst", "security-reviewer", "release-manager", "failure-curator"],
         "specializations": ["runtime-engineer: mobile"],
     },
     "backend-service": {
         "required": [
             "orchestrator",
-            "product-analyst",
-            "solution-architect",
             "bootstrap-planner",
             "runtime-engineer",
             "data-steward",
@@ -94,25 +92,24 @@ ROLE_BASELINE_BY_FAMILY = {
             "qa-validator",
             "docs-operator",
         ],
-        "optional": ["release-manager", "failure-curator"],
+        "optional": ["product-analyst", "solution-architect", "release-manager", "failure-curator"],
         "specializations": ["runtime-engineer: api"],
     },
     "batch-worker": {
-        "required": ["orchestrator", "solution-architect", "runtime-engineer", "data-steward", "qa-validator", "docs-operator"],
-        "optional": ["security-reviewer", "release-manager", "failure-curator"],
+        "required": ["orchestrator", "runtime-engineer", "data-steward", "qa-validator", "docs-operator"],
+        "optional": ["solution-architect", "security-reviewer", "release-manager", "failure-curator"],
         "specializations": ["runtime-engineer: batch"],
     },
     "receiver-integration": {
         "required": [
             "orchestrator",
-            "solution-architect",
             "runtime-engineer",
             "data-steward",
             "security-reviewer",
             "qa-validator",
             "docs-operator",
         ],
-        "optional": ["release-manager", "failure-curator"],
+        "optional": ["solution-architect", "release-manager", "failure-curator"],
         "specializations": ["runtime-engineer: receiver"],
     },
     "mockup-local": {
@@ -125,6 +122,13 @@ ROLE_BASELINE_BY_FAMILY = {
         "optional": ["solution-architect", "failure-curator"],
         "specializations": ["runtime-engineer: tooling"],
     },
+}
+
+
+CONTEXT_BUDGET = {
+    "entryDocs": 3,
+    "roleDocs": 3,
+    "checklists": 2,
 }
 
 
@@ -261,14 +265,14 @@ def derive_agent_coordination(spec: dict) -> dict[str, list[str]]:
         role
         for role in [
             "orchestrator",
-            "product-analyst",
             "bootstrap-planner",
-            "solution-architect",
             "runtime-engineer",
             "data-steward",
             "security-reviewer",
             "qa-validator",
             "docs-operator",
+            "product-analyst",
+            "solution-architect",
             "release-manager",
             "failure-curator",
         ]
@@ -281,6 +285,41 @@ def derive_agent_coordination(spec: dict) -> dict[str, list[str]]:
         "roleSpecializations": specializations,
         "agentWorkflowOrder": workflow,
         "agentRoleOverrides": list(spec.get("agentRoleOverrides", [])),
+    }
+
+
+def derive_context_manifest(spec: dict) -> dict:
+    mode = "bootstrap"
+    fast_path_docs = [
+        "AGENTS.md",
+        "docs/ai/context-profiles.md",
+        "docs/ai/start-bootstrap.md",
+        "docs/ai/project-selection-mapping.md",
+        "docs/ai/roles/README.md",
+        "docs/ai/governance/quality-gates.md",
+    ]
+    deep_path_docs = [
+        "docs/ai/project-bootstrap.md",
+        "docs/ai/project-bootstrap-cli.md",
+        "docs/ai/project-generation-spec.md",
+        "docs/ai/project-generator.md",
+        "docs/ai/stack-matrix.md",
+    ]
+    if spec.get("datastore") != "없음" or spec.get("schemaOwnership") in {"owned", "shared"}:
+        deep_path_docs.append("docs/ai/database-rules.md")
+    if spec.get("projectNature") == "production" or spec.get("deploymentType") != "local-only":
+        deep_path_docs.append("docs/ai/lifecycle.md")
+
+    return {
+        "mode": mode,
+        "projectFamily": spec["projectFamily"],
+        "runtimeRoles": spec.get("runtimeRoles", []),
+        "fastPathDocs": fast_path_docs,
+        "deepPathDocs": unique(deep_path_docs),
+        "coreRoles": spec["requiredAgentRoles"],
+        "extendedRoles": spec["optionalAgentRoles"],
+        "roleSpecializations": spec["roleSpecializations"],
+        "contextBudget": dict(CONTEXT_BUDGET),
     }
 
 
@@ -479,9 +518,10 @@ def write_root_readme(target_dir: Path, spec: dict, scaffold_profile: str | None
 1. Review `AGENTS.md`, `docs/ai/project-bootstrap.md`, and `docs/ai/command-catalog.md`.
 2. Install the local git hook pack with `python3 scripts/install_git_hooks.py`.
 3. Review `.agent-base/pre-commit-config.json` and align the preset with the real repository commands.
-4. Update commands, package names, env files, and runtime assumptions to the real repository state.
-5. Run the first build, compile, test, and smoke validation.
-6. Complete `checklists/project-creation.md` and `checklists/first-delivery.md`.
+4. Review `.agent-base/context-manifest.json` and load only the recommended fast-path docs first.
+5. Update commands, package names, env files, and runtime assumptions to the real repository state.
+6. Run the first build, compile, test, and smoke validation.
+7. Complete `checklists/project-creation.md` and `checklists/first-delivery.md`.
 """
     (target_dir / "README.md").write_text(readme, encoding="utf-8")
 
@@ -517,6 +557,10 @@ def write_generation_artifacts(target_dir: Path, spec: dict, template_name: str,
             ensure_ascii=False,
         )
         + "\n",
+        encoding="utf-8",
+    )
+    (meta_dir / "context-manifest.json").write_text(
+        json.dumps(derive_context_manifest(spec), indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
     if support_level == "docs-only":

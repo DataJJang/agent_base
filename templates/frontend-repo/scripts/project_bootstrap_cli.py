@@ -619,11 +619,12 @@ def print_summary(spec: dict, output_root: Path, spec_path: Path) -> None:
     print(f"- template: {template_name}")
     print(f"- scaffold profile: {scaffold_profile or 'docs-only'}")
     print(f"- scaffold support level: {support_level}")
-    print(f"- required agent roles: {', '.join(spec['requiredAgentRoles'])}")
-    print(f"- optional agent roles: {', '.join(spec['optionalAgentRoles'])}")
+    print(f"- core agent roles: {', '.join(spec['requiredAgentRoles'])}")
+    print(f"- extended agent roles: {', '.join(spec['optionalAgentRoles'])}")
     print(f"- role specializations: {', '.join(spec['roleSpecializations'])}")
     print(f"- output root: {output_root}")
     print(f"- spec path: {spec_path}")
+    print("- next context path: AGENTS.md -> context-profiles.md -> start-bootstrap.md")
     if spec["repositoryMode"] != "single-repo":
         print("- note: v1 generator는 샘플 저장소 1개만 만들고, monorepo/multi-repo 확장은 후속 수작업이 필요합니다.")
 

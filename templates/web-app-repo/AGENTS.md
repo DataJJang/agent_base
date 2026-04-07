@@ -58,6 +58,7 @@ Read only these first:
   - [`docs/ai/prompts/README.md`](./docs/ai/prompts/README.md)
   - [`checklists/agent-role-selection.md`](./checklists/agent-role-selection.md)
   - [`checklists/agent-handoff.md`](./checklists/agent-handoff.md)
+  - [`docs/ai/context-manifest.md`](./docs/ai/context-manifest.md)
 
 ## Non-Negotiables
 

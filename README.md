@@ -184,6 +184,7 @@ python3 ./source/scripts/project_bootstrap_cli.py \
 - `docs/ai/prompts/roles/*`
 - `.agent-base/project-generation-spec.json`
 - `.agent-base/generation-manifest.json`
+- `.agent-base/context-manifest.json`
 - `.agent-base/pre-commit-config.json`
 - `.agent-base/agent-role-plan.json`
 - `.githooks/*`
