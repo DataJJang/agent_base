@@ -8,6 +8,13 @@
 
 이 README는 전체 설명보다 빠른 진입을 우선한다. 기본 진입점은 `Python 스크립트 실행`보다 `AI IDE 질의`다. 먼저 아래 3개 중 하나만 고르면 된다.
 
+요구사항은 간단하다.
+
+- `AI IDE 문서/질의 기반 사용`
+  - Python 없이도 가능
+- `generator / helper script / updater / template rebuild`
+  - `python3`가 필요
+
 ### 1. AI IDE로 새 프로젝트를 시작하고 싶다
 
 AI에게 아래처럼 요청하면 된다.
