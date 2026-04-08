@@ -2,16 +2,20 @@
 from __future__ import annotations
 
 import argparse
+from datetime import datetime, timezone
 import json
 import re
 import shutil
+import subprocess
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = ROOT.parent
 SOURCE_DIR = ROOT
 TEMPLATES_DIR = ROOT.parent / "templates"
 SCAFFOLDS_DIR = ROOT / "scaffolds"
+VERSION_FILE = REPO_ROOT / "VERSION"
 
 TEMPLATE_BY_FAMILY = {
     "game": "game-repo",
@@ -391,6 +395,55 @@ def load_spec(path: Path) -> dict:
     spec = normalize_spec(spec)
     validate_spec(spec)
     return spec
+
+
+def load_foundry_version() -> str:
+    if VERSION_FILE.exists():
+        version = VERSION_FILE.read_text(encoding="utf-8").strip()
+        if version:
+            return version
+    return "0.0.0-unknown"
+
+
+def run_git_command(*args: str) -> str:
+    try:
+        result = subprocess.run(
+            ["git", *args],
+            cwd=REPO_ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return ""
+    return result.stdout.strip()
+
+
+def git_is_dirty() -> bool:
+    try:
+        result = subprocess.run(
+            ["git", "status", "--porcelain", "--untracked-files=no"],
+            cwd=REPO_ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return False
+    return bool(result.stdout.strip())
+
+
+def detect_foundry_provenance() -> dict:
+    return {
+        "generatedAtUtc": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+        "foundryVersion": load_foundry_version(),
+        "templateVersion": load_foundry_version(),
+        "foundryCommit": run_git_command("rev-parse", "HEAD"),
+        "foundryCommitShort": run_git_command("rev-parse", "--short", "HEAD"),
+        "foundryTag": run_git_command("describe", "--tags", "--exact-match"),
+        "latestKnownTag": run_git_command("describe", "--tags", "--abbrev=0"),
+        "foundryDirty": git_is_dirty(),
+    }
 
 
 def validate_spec(spec: dict) -> None:
@@ -1692,7 +1745,13 @@ def apply_tokens(root: Path, tokens: dict[str, str]) -> None:
             path.write_text(new_text, encoding="utf-8")
 
 
-def write_root_readme(target_dir: Path, spec: dict, scaffold_profile: str | None, support_level: str) -> None:
+def write_root_readme(
+    target_dir: Path,
+    spec: dict,
+    scaffold_profile: str | None,
+    support_level: str,
+    provenance: dict,
+) -> None:
     coordination_mode = derive_coordination_mode(spec)
     starter_command = "python3 scripts/show_start_path.py"
     if coordination_mode["mode"] == "lite":
@@ -1721,6 +1780,8 @@ def write_root_readme(target_dir: Path, spec: dict, scaffold_profile: str | None
         ]
     next_steps_lines = "\n".join(f"{index}. {step}" for index, step in enumerate(next_steps, start=1))
     coordination_reason_lines = "\n".join(f"- {reason}" for reason in coordination_mode["reasons"])
+    foundry_commit = provenance.get("foundryCommitShort") or provenance.get("foundryCommit") or "unknown"
+    foundry_tag = provenance.get("foundryTag") or provenance.get("latestKnownTag") or "-"
     readme = f"""# {spec['projectName']}
 
 {spec['projectPurpose']}
@@ -1744,6 +1805,16 @@ def write_root_readme(target_dir: Path, spec: dict, scaffold_profile: str | None
 - Scaffold profile: `{scaffold_profile or 'docs-only'}`
 - Scaffold support level: `{support_level}`
 
+## Foundry Provenance
+
+- Foundry version: `{provenance.get('foundryVersion') or 'unknown'}`
+- Template version: `{provenance.get('templateVersion') or 'unknown'}`
+- Foundry commit: `{foundry_commit}`
+- Latest known tag: `{foundry_tag}`
+- Generated at (UTC): `{provenance.get('generatedAtUtc') or 'unknown'}`
+- Foundry worktree dirty at generation: `{'yes' if provenance.get('foundryDirty') else 'no'}`
+- Provenance manifest: `.agent-base/generation-manifest.json`
+
 ## Recommended Coordination Mode
 
 - Mode: `{coordination_mode['label']}`
@@ -1759,6 +1830,7 @@ Why this mode:
 ```
 
 이 명령은 현재 저장소의 추천 mode, blocking refinement, workboard 상태를 읽고 지금 바로 할 3가지 액션만 보여준다.
+또한 `.agent-base/generation-manifest.json`을 함께 보면 이 저장소를 만든 foundry baseline과 commit provenance를 확인할 수 있다.
 현재 사용하는 AI 모델 tier를 알고 있으면 `.agent-base/model-routing.json`과 같이 비교하도록 AI에게 요청하거나 아래처럼 helper에 직접 넘길 수 있다.
 
 ```bash
@@ -1936,7 +2008,14 @@ def write_agent_handoff_log(target_dir: Path, workboard: dict) -> None:
     target_path.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
 
 
-def write_generation_artifacts(target_dir: Path, spec: dict, template_name: str, scaffold_profile: str | None, support_level: str) -> None:
+def write_generation_artifacts(
+    target_dir: Path,
+    spec: dict,
+    template_name: str,
+    scaffold_profile: str | None,
+    support_level: str,
+    provenance: dict,
+) -> None:
     meta_dir = target_dir / ".agent-base"
     meta_dir.mkdir(parents=True, exist_ok=True)
     refinement_manifest = derive_refinement_manifest(spec, scaffold_profile, support_level)
@@ -1965,6 +2044,14 @@ def write_generation_artifacts(target_dir: Path, spec: dict, template_name: str,
         json.dumps(spec, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
     )
     manifest = {
+        "generatedAtUtc": provenance["generatedAtUtc"],
+        "foundryVersion": provenance["foundryVersion"],
+        "templateVersion": provenance["templateVersion"],
+        "foundryCommit": provenance["foundryCommit"],
+        "foundryCommitShort": provenance["foundryCommitShort"],
+        "foundryTag": provenance["foundryTag"],
+        "latestKnownTag": provenance["latestKnownTag"],
+        "foundryDirty": provenance["foundryDirty"],
         "template": template_name,
         "scaffoldProfile": scaffold_profile,
         "supportLevel": support_level,
@@ -1984,6 +2071,7 @@ def write_generation_artifacts(target_dir: Path, spec: dict, template_name: str,
         "handoffPacketDirectoryPath": "docs/ai/handoff-packets",
         "starterCommandPath": "scripts/show_start_path.py",
         "starterCommand": "python3 scripts/show_start_path.py",
+        "versioningDocPath": "docs/ai/governance/version-provenance.md",
         "refinementModuleIds": [module["id"] for module in refinement_manifest["modules"]],
         "highPriorityRefinementModuleIds": refinement_manifest["summary"]["highPriorityModuleIds"],
     }
@@ -2037,6 +2125,7 @@ def write_precommit_config(target_dir: Path, spec: dict) -> None:
 def generate_project(spec: dict, output_root: Path, force: bool) -> Path:
     spec = normalize_spec(spec)
     template_name = TEMPLATE_BY_FAMILY[spec["projectFamily"]]
+    provenance = detect_foundry_provenance()
     target_dir = output_root / spec["repositoryName"]
     if target_dir.exists():
         if not force:
@@ -2054,8 +2143,8 @@ def generate_project(spec: dict, output_root: Path, force: bool) -> Path:
 
     tokens = build_token_map(spec)
     apply_tokens(target_dir, tokens)
-    write_root_readme(target_dir, spec, scaffold_profile, support_level)
-    write_generation_artifacts(target_dir, spec, template_name, scaffold_profile, support_level)
+    write_root_readme(target_dir, spec, scaffold_profile, support_level, provenance)
+    write_generation_artifacts(target_dir, spec, template_name, scaffold_profile, support_level, provenance)
     write_repo_local_overrides(target_dir, spec, derive_refinement_manifest(spec, scaffold_profile, support_level))
     write_precommit_config(target_dir, spec)
     return target_dir

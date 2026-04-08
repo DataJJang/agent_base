@@ -65,6 +65,7 @@
 - [`governance/agent-failure-learning.md`](./governance/agent-failure-learning.md)
 - [`governance/release-and-rollback.md`](./governance/release-and-rollback.md)
 - [`governance/evaluation-and-drift.md`](./governance/evaluation-and-drift.md)
+- [`governance/version-provenance.md`](./governance/version-provenance.md)
 
 ### Tools / Examples
 

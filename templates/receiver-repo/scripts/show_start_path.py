@@ -635,6 +635,16 @@ def build_report(
     }
     active_model_policy = select_model_policy(model_routing, state)
     model_tier_check = evaluate_model_tier(active_model_policy, model_context)
+    provenance = {
+        "foundryVersion": (generation_manifest or {}).get("foundryVersion", ""),
+        "templateVersion": (generation_manifest or {}).get("templateVersion", ""),
+        "foundryCommit": (generation_manifest or {}).get("foundryCommit", ""),
+        "foundryCommitShort": (generation_manifest or {}).get("foundryCommitShort", ""),
+        "foundryTag": (generation_manifest or {}).get("foundryTag", ""),
+        "latestKnownTag": (generation_manifest or {}).get("latestKnownTag", ""),
+        "generatedAtUtc": (generation_manifest or {}).get("generatedAtUtc", ""),
+        "foundryDirty": bool((generation_manifest or {}).get("foundryDirty", False)),
+    }
 
     return {
         "mode": mode,
@@ -642,6 +652,7 @@ def build_report(
         "summary": summary,
         "reasons": reasons,
         "state": state,
+        "provenance": provenance,
         "modelTierCheck": model_tier_check,
         "actions": build_actions(mode, state),
         "escalateWhen": ESCALATION_HINTS.get(mode, ""),
@@ -660,6 +671,27 @@ def print_report(report: dict) -> None:
     print(f"- Design-freeze status: {report['state']['designFreezeStatus']}")
     print(f"- Next suggested lane: {report['state']['nextSuggestedLaneId'] or '-'}")
     print(f"- Latest packet path: {report['state']['latestPacketPath'] or '-'}")
+    provenance = report.get("provenance", {})
+    if any(provenance.values()):
+        print(f"- Foundry version: {provenance.get('foundryVersion') or '-'}")
+        print(f"- Template version: {provenance.get('templateVersion') or '-'}")
+        print(
+            "- Foundry commit: "
+            + (
+                provenance.get("foundryCommitShort")
+                or provenance.get("foundryCommit")
+                or "-"
+            )
+        )
+        if provenance.get("foundryTag") or provenance.get("latestKnownTag"):
+            print(
+                f"- Foundry tag: {provenance.get('foundryTag') or provenance.get('latestKnownTag')}"
+            )
+        if provenance.get("generatedAtUtc"):
+            print(f"- Generated at (UTC): {provenance['generatedAtUtc']}")
+        print(
+            f"- Foundry worktree at generation: {'dirty' if provenance.get('foundryDirty') else 'clean'}"
+        )
     model_tier_check = report.get("modelTierCheck", {})
     if model_tier_check:
         print(f"- Model tier status: {model_tier_check.get('status', '-')}")

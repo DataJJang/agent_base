@@ -12,6 +12,7 @@
 - 지원되는 언어/프레임워크 조합이면 scaffold를 추가 생성한다.
 - 토큰 치환 규칙에 따라 프로젝트 메타데이터를 실제 값으로 바꾼다.
 - 결과 저장소에는 생성 당시 spec, manifest, context manifest, agent role plan을 같이 남긴다.
+- `.agent-base/generation-manifest.json`에는 생성 당시 foundry version, template version, commit provenance도 같이 남긴다.
 
 ## 3. 권장 CLI 인터뷰 실행
 
@@ -87,6 +88,7 @@ python3 source/scripts/generate_project.py \
 - root `README.md`
 - `.agent-base/project-generation-spec.json`
 - `.agent-base/generation-manifest.json`
+  - `foundryVersion`, `templateVersion`, `foundryCommit`, `generatedAtUtc`
 - `.agent-base/context-manifest.json`
 - `.agent-base/agent-role-plan.json`
 - `.agent-base/refinement-manifest.json`
@@ -100,6 +102,15 @@ python3 source/scripts/generate_project.py \
 - 필요 시 `TODO_UNSUPPORTED_SCAFFOLD.md`
 
 생성된 root `README.md`와 `.agent-base/context-manifest.json`은 추천 coordination mode와 그 이유를 같이 남긴다.
+또한 생성된 root `README.md`, `.agent-base/generation-manifest.json`, `scripts/show_start_path.py`에서 foundry provenance를 바로 확인할 수 있다.
+
+## 6.1 version provenance
+
+- maintainers는 루트 `VERSION` 파일을 current baseline으로 관리한다.
+- generator는 이 값을 `.agent-base/generation-manifest.json`의 `foundryVersion`, `templateVersion`으로 복사한다.
+- git metadata를 읽을 수 있으면 `foundryCommit`, `foundryCommitShort`, `foundryTag`, `latestKnownTag`, `foundryDirty`도 함께 남긴다.
+- 생성 시간은 `generatedAtUtc`로 남긴다.
+- generated repo에서 baseline 추적이 필요하면 `.agent-base/generation-manifest.json`을 source of truth로 본다.
 
 ## 7. 후속 작업
 
