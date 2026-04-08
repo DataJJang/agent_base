@@ -410,6 +410,8 @@ def derive_agent_coordination(spec: dict) -> dict[str, list[str]]:
     release_needed = spec.get("deploymentType") != "local-only" or spec.get("projectNature") == "production"
     if release_needed and "release-manager" not in optional:
         optional.append("release-manager")
+    if not release_needed:
+        optional = [role for role in optional if role != "release-manager"]
 
     workflow = [
         role

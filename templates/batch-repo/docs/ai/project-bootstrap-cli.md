@@ -38,29 +38,20 @@ CLI는 아래 순서로 질문한다.
 3. 프로젝트 목적
 4. 프로젝트 패밀리
 5. 프로젝트 성격
-6. 저장소 구성 방식
-7. 대상 사용자
-8. 대상 플랫폼
-9. 런타임 역할
-10. 언어
-11. 프레임워크
-12. 런타임 버전
-13. 빌드 도구
-14. 테스트 도구
-15. 데이터 저장소
-16. cache
-17. 배포 유형
-18. 서비스 기동 형태
-19. 로깅 방식
-20. 동작 OS
-21. 보안/인증 방식
-22. 대상 환경
-23. 핵심 외부 연동
-24. DB 관련 추가 항목
-25. 기본 문서 세트
-26. 추가 예외/메모
-27. output root
-28. spec 저장 경로
+6. 런타임 역할
+7. 입력 방식 선택
+  - `quick-start`
+  - `guided-review`
+  - `full-detail`
+8. `quick-start`면 추천 baseline을 보여주고 대부분의 값을 자동 채운다.
+9. `guided-review` 또는 `full-detail`이면 저장소 구성 방식부터 세부 항목을 순서대로 확인한다.
+10. DB 관련 추가 항목
+11. 기본 문서 세트
+12. 추가 예외/메모
+13. output root
+14. spec 저장 경로
+
+핵심 의도는 `최종 spec에는 값이 있어야 하지만, 초기 인터뷰에서 사용자가 모든 값을 같은 무게로 직접 입력하지는 않아도 된다`는 점이다.
 
 ## 5. 출력
 
@@ -85,6 +76,7 @@ spec은 `.agent-base/project-generation-spec.json`으로도 생성 저장소 안
 - 이 경우 CLI는 spec에는 해당 값을 기록하지만, 실제 다중 저장소 분리는 후속 수작업 또는 별도 생성기로 확장해야 한다.
 - Java 계열은 `packageName`을 반드시 확정해야 한다.
 - DB를 소유하는 저장소는 `dbEngine`, `schemaOwnership`, `migrationPath`를 함께 기록해야 한다.
+- quick-start baseline은 일반적인 로컬 시작 경로를 위한 기본값이다. production, rollout, shared DB 같은 조건이 있으면 `guided-review` 또는 `full-detail`로 전환하는 편이 안전하다.
 
 ## 7. 후속 작업
 

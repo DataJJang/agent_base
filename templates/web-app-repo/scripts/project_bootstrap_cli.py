@@ -346,6 +346,12 @@ STARTUP_OPTIONS_BY_FAMILY = {
     "library-tooling": ["CLI", "library package"],
 }
 
+INTERVIEW_INPUT_MODES = [
+    "quick-start",
+    "guided-review",
+    "full-detail",
+]
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run an interactive bootstrap interview and generate a sample project.")
@@ -528,8 +534,58 @@ def prompt_list(label: str, default: list[str] | None = None) -> list[str]:
 
 def family_defaults(project_family: str, project_nature: str) -> dict:
     defaults = dict(DEFAULTS_BY_FAMILY[project_family])
+    defaults["repositoryMode"] = "single-repo"
     defaults["targetEnvironments"] = default_target_environments(project_nature)
     return defaults
+
+
+def recommended_security_profile(project_family: str, runtime_roles: list[str], family_default: str) -> str:
+    runtime_role_set = set(runtime_roles)
+    if runtime_role_set.intersection({"api", "receiver"}):
+        return "JWT"
+    if project_family == "mobile-app":
+        return "platform-auth"
+    if runtime_role_set.intersection({"batch", "worker"}) or project_family == "batch-worker":
+        return "internal-auth"
+    return family_default
+
+
+def quick_start_defaults(project_family: str, project_nature: str, runtime_roles: list[str]) -> dict:
+    defaults = family_defaults(project_family, project_nature)
+    defaults["runtimeRoles"] = list(runtime_roles)
+    defaults["repositoryMode"] = "single-repo"
+    defaults["datastore"] = "없음"
+    defaults["cache"] = "없음"
+    defaults["deploymentType"] = "local-only"
+    defaults["targetEnvironments"] = ["local"]
+    defaults["externalIntegrations"] = []
+    defaults["securityProfile"] = recommended_security_profile(
+        project_family,
+        runtime_roles,
+        defaults["securityProfile"],
+    )
+    return defaults
+
+
+def default_interview_mode(project_nature: str) -> str:
+    return "guided-review" if project_nature == "production" else "quick-start"
+
+
+def print_baseline_summary(project_family: str, project_nature: str, runtime_roles: list[str], defaults: dict) -> None:
+    print_header("추천 baseline")
+    print(f"- project family: {project_family}")
+    print(f"- project nature: {project_nature}")
+    print(f"- runtime roles: {', '.join(runtime_roles)}")
+    print(f"- repository mode: {defaults['repositoryMode']}")
+    print(f"- language / framework: {defaults['language']} / {defaults['framework']}")
+    print(f"- build / test: {defaults['buildTool']} / {defaults['testTool']}")
+    print(f"- datastore / cache: {defaults['datastore']} / {defaults['cache']}")
+    print(f"- deployment type: {defaults['deploymentType']}")
+    print(f"- security profile: {defaults['securityProfile']}")
+    print(f"- target environments: {', '.join(defaults['targetEnvironments'])}")
+    integrations = ", ".join(defaults["externalIntegrations"]) or "없음"
+    print(f"- external integrations: {integrations}")
+    print("이 baseline은 일반적인 quick-start를 위한 기본 추천이며, production 또는 운영 이슈는 이후 review 단계에서 확장한다.")
 
 
 def build_interactive_spec(args: argparse.Namespace) -> tuple[dict, Path, Path]:
@@ -539,27 +595,55 @@ def build_interactive_spec(args: argparse.Namespace) -> tuple[dict, Path, Path]:
     project_purpose = prompt_text("프로젝트 목적")
     project_family = prompt_choice("프로젝트 패밀리", PROJECT_FAMILIES)
     project_nature = prompt_choice("프로젝트 성격", PROJECT_NATURES, "prototype")
-    repository_mode = prompt_choice("저장소 구성 방식", REPOSITORY_MODES, "single-repo")
 
-    defaults = family_defaults(project_family, project_nature)
+    family_detail_defaults = family_defaults(project_family, project_nature)
+    runtime_roles = prompt_multi("런타임 역할", RUNTIME_ROLES, family_detail_defaults["runtimeRoles"])
+    recommended_defaults = quick_start_defaults(project_family, project_nature, runtime_roles)
+    interview_mode = prompt_choice("입력 방식", INTERVIEW_INPUT_MODES, default_interview_mode(project_nature))
+    if interview_mode == "quick-start":
+        print_baseline_summary(project_family, project_nature, runtime_roles, recommended_defaults)
+        if not prompt_yes_no("위 baseline을 그대로 채우고 계속할까요?", True):
+            interview_mode = "guided-review"
 
-    target_users = prompt_list("대상 사용자 (쉼표 구분)", defaults["targetUsers"])
-    target_platforms = prompt_multi("대상 플랫폼", TARGET_PLATFORMS, defaults["targetPlatforms"])
-    runtime_roles = prompt_multi("런타임 역할", RUNTIME_ROLES, defaults["runtimeRoles"])
-    language = prompt_choice("프로그램 언어", LANGUAGE_OPTIONS_BY_FAMILY[project_family], defaults["language"])
-    framework = prompt_choice("프레임워크", FRAMEWORK_OPTIONS_BY_FAMILY[project_family], defaults["framework"])
-    runtime_version = prompt_text("런타임 버전", defaults["runtimeVersion"])
-    build_tool = prompt_text("빌드 도구", defaults["buildTool"])
-    test_tool = prompt_text("테스트 도구", defaults["testTool"])
-    datastore = prompt_choice("데이터 저장소", DATASTORES, defaults["datastore"])
-    cache = prompt_choice("캐시", CACHES, defaults["cache"])
-    deployment_type = prompt_choice("배포 유형", DEPLOYMENT_TYPES, defaults["deploymentType"])
-    startup_mode = prompt_choice("서비스 기동 형태", STARTUP_OPTIONS_BY_FAMILY[project_family], defaults["startupMode"])
-    logging_mode = prompt_choice("로깅 방식", LOGGING_MODES, defaults["loggingMode"])
-    target_os = prompt_multi("동작 OS", TARGET_OS, defaults["targetOs"])
-    security_profile = prompt_choice("보안/인증 방식", SECURITY_PROFILES, defaults["securityProfile"])
-    target_environments = prompt_multi("대상 환경", TARGET_ENVIRONMENTS, defaults["targetEnvironments"])
-    external_integrations = prompt_list("핵심 외부 연동 (쉼표 구분)", defaults["externalIntegrations"])
+    active_defaults = dict(family_detail_defaults if interview_mode == "full-detail" else recommended_defaults)
+    baseline_defaults = dict(active_defaults)
+
+    if interview_mode == "quick-start":
+        repository_mode = active_defaults["repositoryMode"]
+        target_users = list(active_defaults["targetUsers"])
+        target_platforms = list(active_defaults["targetPlatforms"])
+        language = active_defaults["language"]
+        framework = active_defaults["framework"]
+        runtime_version = active_defaults["runtimeVersion"]
+        build_tool = active_defaults["buildTool"]
+        test_tool = active_defaults["testTool"]
+        datastore = active_defaults["datastore"]
+        cache = active_defaults["cache"]
+        deployment_type = active_defaults["deploymentType"]
+        startup_mode = active_defaults["startupMode"]
+        logging_mode = active_defaults["loggingMode"]
+        target_os = list(active_defaults["targetOs"])
+        security_profile = active_defaults["securityProfile"]
+        target_environments = list(active_defaults["targetEnvironments"])
+        external_integrations = list(active_defaults["externalIntegrations"])
+    else:
+        repository_mode = prompt_choice("저장소 구성 방식", REPOSITORY_MODES, active_defaults["repositoryMode"])
+        target_users = prompt_list("대상 사용자 (쉼표 구분)", active_defaults["targetUsers"])
+        target_platforms = prompt_multi("대상 플랫폼", TARGET_PLATFORMS, active_defaults["targetPlatforms"])
+        language = prompt_choice("프로그램 언어", LANGUAGE_OPTIONS_BY_FAMILY[project_family], active_defaults["language"])
+        framework = prompt_choice("프레임워크", FRAMEWORK_OPTIONS_BY_FAMILY[project_family], active_defaults["framework"])
+        runtime_version = prompt_text("런타임 버전", active_defaults["runtimeVersion"])
+        build_tool = prompt_text("빌드 도구", active_defaults["buildTool"])
+        test_tool = prompt_text("테스트 도구", active_defaults["testTool"])
+        datastore = prompt_choice("데이터 저장소", DATASTORES, active_defaults["datastore"])
+        cache = prompt_choice("캐시", CACHES, active_defaults["cache"])
+        deployment_type = prompt_choice("배포 유형", DEPLOYMENT_TYPES, active_defaults["deploymentType"])
+        startup_mode = prompt_choice("서비스 기동 형태", STARTUP_OPTIONS_BY_FAMILY[project_family], active_defaults["startupMode"])
+        logging_mode = prompt_choice("로깅 방식", LOGGING_MODES, active_defaults["loggingMode"])
+        target_os = prompt_multi("동작 OS", TARGET_OS, active_defaults["targetOs"])
+        security_profile = prompt_choice("보안/인증 방식", SECURITY_PROFILES, active_defaults["securityProfile"])
+        target_environments = prompt_multi("대상 환경", TARGET_ENVIRONMENTS, active_defaults["targetEnvironments"])
+        external_integrations = prompt_list("핵심 외부 연동 (쉼표 구분)", active_defaults["externalIntegrations"])
 
     spec: dict = {
         "repositoryName": repository_name,
@@ -588,17 +672,29 @@ def build_interactive_spec(args: argparse.Namespace) -> tuple[dict, Path, Path]:
     }
 
     if language.lower() == "java":
-        spec["packageName"] = prompt_text("Java packageName", default_package_name(repository_name))
+        if interview_mode == "quick-start":
+            spec["packageName"] = default_package_name(repository_name)
+        else:
+            spec["packageName"] = prompt_text("Java packageName", default_package_name(repository_name))
 
     if datastore != "없음":
-        spec["dbEngine"] = prompt_text("DB 엔진/버전", default_db_engine(datastore))
-        spec["schemaOwnership"] = prompt_choice("schema ownership", SCHEMA_OWNERSHIP_OPTIONS, "owned")
-        spec["migrationPath"] = prompt_text("migration 경로", default_migration_path(project_family, language))
+        if interview_mode == "quick-start":
+            spec["dbEngine"] = default_db_engine(datastore)
+            spec["schemaOwnership"] = "owned"
+            spec["migrationPath"] = default_migration_path(project_family, language)
+        else:
+            spec["dbEngine"] = prompt_text("DB 엔진/버전", default_db_engine(datastore))
+            spec["schemaOwnership"] = prompt_choice("schema ownership", SCHEMA_OWNERSHIP_OPTIONS, "owned")
+            spec["migrationPath"] = prompt_text("migration 경로", default_migration_path(project_family, language))
 
     suggested_docs = derive_base_document_set(spec)
-    spec["baseDocumentSet"] = prompt_multi("기본 문서 세트", DOCUMENT_SET_OPTIONS, suggested_docs)
-    exceptions = detect_exceptions(spec, defaults)
-    extra_exceptions = prompt_list("추가 예외/메모 (쉼표 구분, 없으면 Enter)", [])
+    if interview_mode == "quick-start":
+        spec["baseDocumentSet"] = suggested_docs
+        extra_exceptions = []
+    else:
+        spec["baseDocumentSet"] = prompt_multi("기본 문서 세트", DOCUMENT_SET_OPTIONS, suggested_docs)
+        extra_exceptions = prompt_list("추가 예외/메모 (쉼표 구분, 없으면 Enter)", [])
+    exceptions = detect_exceptions(spec, baseline_defaults)
     spec["exceptions"] = unique(exceptions + extra_exceptions)
     spec.update(derive_agent_coordination(spec))
 

@@ -2,45 +2,79 @@
 
 ## 1. 목적
 
-이 문서는 새 저장소를 생성할 때 반드시 확정해야 하는 정규화 입력값과 프로젝트 패밀리별 필수 산출 구조를 정의한다.
+이 문서는 새 저장소를 생성할 때 최종 spec에 들어가야 하는 정규화 입력값과 프로젝트 패밀리별 필수 산출 구조를 정의한다.
 
-## 2. 필수 입력값
+중요한 점은 `최종 spec에 값이 있어야 한다`와 `초기 인터뷰에서 사용자가 전부 직접 입력해야 한다`가 같지 않다는 것이다.
+
+- `초기 확정 필수`
+  - 초반에 반드시 직접 확인해야 하는 항목
+- `추천 기본값 있음`
+  - bootstrap CLI가 project family, project nature, runtime role을 바탕으로 기본 추천값을 채울 수 있는 항목
+- `조건부 필수`
+  - Java, DB ownership, 예외 상황처럼 특정 조건에서만 직접 확정하면 되는 항목
+
+## 2. 생성기 입력값
 
 생성기 입력 JSON key는 아래 camelCase 이름을 사용한다.
 
-| 항목 | JSON key | 설명 | 필수 여부 |
+| 항목 | JSON key | 설명 | 초기 입력 정책 |
 | --- | --- | --- | --- |
-| 저장소명 | `repositoryName` | git 저장소 이름 | 필수 |
-| 프로젝트명 | `projectName` | 사용자에게 보이는 프로젝트 이름 | 필수 |
-| 프로젝트 목적 | `projectPurpose` | 왜 만드는지에 대한 1~3문장 설명 | 필수 |
-| 프로젝트 패밀리 | `projectFamily` | `game`, `web-app`, `pwa`, `mobile-app`, `backend-service`, `batch-worker`, `receiver-integration`, `mockup-local`, `library-tooling` | 필수 |
-| 프로젝트 성격 | `projectNature` | `prototype`, `production`, `internal-tool`, `demo`, `local-only`, `research` | 필수 |
-| 저장소 구성 방식 | `repositoryMode` | `single-repo`, `monorepo`, `multi-repo` | 필수 |
-| 대상 사용자 | `targetUsers` | 내부 사용자, 운영자, 일반 고객, 게이머 등 | 필수 |
-| 대상 플랫폼 | `targetPlatforms` | browser, Android, iOS, Windows, macOS, server, CLI 등 | 필수 |
-| 런타임 역할 | `runtimeRoles` | `frontend`, `api`, `batch`, `receiver`, `client`, `tooling`, `worker` 중 하나 이상 | 필수 |
-| 기본 언어 | `language` | TypeScript 또는 Java 등 | 필수 |
-| 런타임 버전 | `runtimeVersion` | Node.js, Java 등 | 필수 |
-| 프레임워크 | `framework` | React, Spring Boot 등 | 필수 |
-| 빌드 도구 | `buildTool` | npm, Gradle 등 | 필수 |
-| 테스트 도구 | `testTool` | Jest, Gradle test, repo-local tool | 필수 |
-| 데이터 저장소 | `datastore` | 없음, MariaDB, PostgreSQL, SQLite, Firestore 등 | 필수 |
-| cache | `cache` | 없음, Redis, in-memory 등 | 필수 |
-| 배포 유형 | `deploymentType` | local-only, static-hosting, container, VM, store-release 등 | 필수 |
-| 서비스 기동 형태 | `startupMode` | SPA, mobile package, Unity player, long-running service, scheduled job, event-driven worker, CLI 등 | 필수 |
-| 로깅 방식 | `loggingMode` | console, file, structured JSON, remote collector 등 | 필수 |
-| 동작 OS | `targetOs` | Windows, macOS, Linux, Android, iOS 등 | 필수 |
-| 보안/인증 방식 | `securityProfile` | 없음, session, JWT, platform auth, store auth 등 | 필수 |
-| 그룹명/패키지명 | `packageName` | Java 계열 namespace 기준 | Java 계열 필수 |
-| 대상 환경 | `targetEnvironments` | `local`, `dev`, `stg`, `prd` 중 사용 환경 | 필수 |
-| 핵심 외부 연동 | `externalIntegrations` | DB, Redis, MQTT, Telegram, 내부 API 등 | 필수 |
-| DB 엔진/버전 | `dbEngine` | MariaDB, MySQL, PostgreSQL 등 | DB 소유 저장소 필수 |
-| schema ownership | `schemaOwnership` | schema, migration, seed를 이 저장소가 소유하는지 여부 | DB 관련 저장소 필수 |
-| migration 위치 | `migrationPath` | `sql`, `db/migration`, 별도 DDL 경로 등 | DB 관련 저장소 필수 |
-| 기본 문서 세트 | `baseDocumentSet` | README, runbook, deployment-checklist, validation guide 등 | 필수 |
-| 예외 사항 | `exceptions` | 공통 권장 스택을 벗어나는 항목과 이유 | 조건부 필수 |
+| 저장소명 | `repositoryName` | git 저장소 이름 | 초기 확정 필수 |
+| 프로젝트명 | `projectName` | 사용자에게 보이는 프로젝트 이름 | 초기 확정 필수 |
+| 프로젝트 목적 | `projectPurpose` | 왜 만드는지에 대한 1~3문장 설명 | 초기 확정 필수 |
+| 프로젝트 패밀리 | `projectFamily` | `game`, `web-app`, `pwa`, `mobile-app`, `backend-service`, `batch-worker`, `receiver-integration`, `mockup-local`, `library-tooling` | 초기 확정 필수 |
+| 프로젝트 성격 | `projectNature` | `prototype`, `production`, `internal-tool`, `demo`, `local-only`, `research` | 초기 확정 필수 |
+| 런타임 역할 | `runtimeRoles` | `frontend`, `api`, `batch`, `receiver`, `client`, `tooling`, `worker` 중 하나 이상 | 초기 확정 필수 |
+| 저장소 구성 방식 | `repositoryMode` | `single-repo`, `monorepo`, `multi-repo` | 추천 기본값 있음 |
+| 대상 사용자 | `targetUsers` | 내부 사용자, 운영자, 일반 고객, 게이머 등 | 추천 기본값 있음 |
+| 대상 플랫폼 | `targetPlatforms` | browser, Android, iOS, Windows, macOS, server, CLI 등 | 추천 기본값 있음 |
+| 기본 언어 | `language` | TypeScript 또는 Java 등 | 추천 기본값 있음 |
+| 런타임 버전 | `runtimeVersion` | Node.js, Java 등 | 추천 기본값 있음 |
+| 프레임워크 | `framework` | React, Spring Boot 등 | 추천 기본값 있음 |
+| 빌드 도구 | `buildTool` | npm, Gradle 등 | 추천 기본값 있음 |
+| 테스트 도구 | `testTool` | Jest, Gradle test, repo-local tool | 추천 기본값 있음 |
+| 데이터 저장소 | `datastore` | 없음, MariaDB, PostgreSQL, SQLite, Firestore 등 | 추천 기본값 있음 |
+| cache | `cache` | 없음, Redis, in-memory 등 | 추천 기본값 있음 |
+| 배포 유형 | `deploymentType` | local-only, static-hosting, container, VM, store-release 등 | 추천 기본값 있음 |
+| 서비스 기동 형태 | `startupMode` | SPA, mobile package, Unity player, long-running service, scheduled job, event-driven worker, CLI 등 | 추천 기본값 있음 |
+| 로깅 방식 | `loggingMode` | console, file, structured JSON, remote collector 등 | 추천 기본값 있음 |
+| 동작 OS | `targetOs` | Windows, macOS, Linux, Android, iOS 등 | 추천 기본값 있음 |
+| 보안/인증 방식 | `securityProfile` | 없음, session, JWT, platform auth, store auth 등 | 추천 기본값 있음 |
+| 대상 환경 | `targetEnvironments` | `local`, `dev`, `stg`, `prd` 중 사용 환경 | 추천 기본값 있음 |
+| 핵심 외부 연동 | `externalIntegrations` | DB, Redis, MQTT, Telegram, 내부 API 등 | 추천 기본값 있음 |
+| 기본 문서 세트 | `baseDocumentSet` | README, runbook, deployment-checklist, validation guide 등 | 추천 기본값 있음 |
+| 그룹명/패키지명 | `packageName` | Java 계열 namespace 기준 | 조건부 필수 |
+| DB 엔진/버전 | `dbEngine` | MariaDB, MySQL, PostgreSQL 등 | 조건부 필수 |
+| schema ownership | `schemaOwnership` | schema, migration, seed를 이 저장소가 소유하는지 여부 | 조건부 필수 |
+| migration 위치 | `migrationPath` | `sql`, `db/migration`, 별도 DDL 경로 등 | 조건부 필수 |
+| 예외 사항 | `exceptions` | 공통 권장 스택을 벗어나는 항목과 이유 | 필요 시 추가 |
 
-## 2-1. 파생 coordination 필드
+## 2-1. Bootstrap CLI quick-start 기본값
+
+bootstrap CLI는 `projectFamily`, `projectNature`, `runtimeRoles`가 정해지면 `quick-start`, `guided-review`, `full-detail` 중 입력 깊이를 고르게 한다.
+
+- 기본은 `quick-start`
+  - 일반적인 시작 케이스에서 질문 수를 줄이기 위한 기본 경로
+- `production`은 기본값을 `guided-review`로 둔다
+  - 운영/배포 이슈를 너무 늦게 미루지 않도록 하기 위함
+
+현재 quick-start baseline은 아래 기준을 우선 추천한다.
+
+- `repositoryMode`: `single-repo`
+- `datastore`: `없음`
+- `cache`: `없음`
+- `deploymentType`: `local-only`
+- `targetEnvironments`: `local`
+- `runtimeRoles`: 직접 확정
+- `securityProfile`
+  - `api`, `receiver`가 있으면 기본 추천은 `JWT`
+  - mobile은 `platform-auth`
+  - batch/worker 성격이면 `internal-auth`
+  - 그 외에는 패밀리 기본값 유지
+
+즉, 최종 spec에는 값이 모두 남지만, 일반적인 quick-start에서는 위험도가 높은 항목을 보수적인 기본값으로 먼저 채우고 이후 refinement에서 확장하는 흐름을 기본으로 둔다.
+
+## 2-2. 파생 coordination 필드
 
 아래 필드는 bootstrap CLI와 generator가 자동으로 파생하거나 보정한다. 수동 spec를 쓸 때도 비워 두지 않는 것을 권장한다.
 
@@ -61,7 +95,7 @@
 - `deploymentType != local-only`이면 `release-manager`를 기본 optional로 올린다.
 - `runtimeRoles`에 따라 `runtime-engineer:*` specialization을 자동으로 붙인다.
 
-## 2-2. 생성기 입력 예시
+## 2-3. 생성기 입력 예시
 
 ```json
 {
@@ -102,7 +136,7 @@
 }
 ```
 
-## 2-3. 실행형 산출물
+## 2-4. 실행형 산출물
 
 generator는 spec를 받아 아래 산출물을 같이 남긴다.
 
