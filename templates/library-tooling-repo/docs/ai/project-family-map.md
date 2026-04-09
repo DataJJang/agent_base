@@ -46,4 +46,4 @@
 | UI 선검토/제안 단계 | `mockup-local` 또는 `web-app` | KRDS component fit과 접근성 검토를 우선한다 |
 | 공통 모듈/기관 공용 도구 | `library-tooling` | 기관 공통 배포 형식, 설치 경로, 운영 절차를 같이 문서화한다 |
 
-전자정부 프로젝트라고 해서 별도 family를 강제로 만들 필요는 없다. 보통은 기존 family를 고르고, `constraintMode`, `legacy-exception-policy`, `compatibility-matrix`, `migration-strategy`로 공공 특유의 제약을 표현하는 편이 더 안정적이다.
+전자정부 프로젝트라고 해서 별도 family를 강제로 만들 필요는 없다. 보통은 기존 family를 고르고, `organizationProfile = egov-public-sector`, `constraintMode`, `legacy-exception-policy`, `compatibility-matrix`, `migration-strategy`로 공공 특유의 제약을 표현하는 편이 더 안정적이다.

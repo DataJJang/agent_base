@@ -8,6 +8,7 @@ from pathlib import Path
 
 from generate_project import (
     CONSTRAINT_MODES,
+    ORGANIZATION_PROFILES,
     TEMPLATE_BY_FAMILY,
     choose_scaffold_plan,
     derive_agent_coordination,
@@ -361,6 +362,11 @@ CONSTRAINT_MODE_OPTIONS = [
     "legacy-maintenance",
 ]
 
+ORGANIZATION_PROFILE_OPTIONS = [
+    "none",
+    "egov-public-sector",
+]
+
 CONTAINER_POLICY_OPTIONS = [
     "unknown",
     "allowed",
@@ -436,6 +442,8 @@ def derive_base_document_set(spec: dict) -> list[str]:
     if spec["projectFamily"] in {"backend-service", "batch-worker", "receiver-integration"} or spec["projectNature"] == "production":
         docs.append("operations-manual")
     if spec["datastore"] != "없음":
+        docs.append("impact-analysis")
+    if spec.get("organizationProfile") == "egov-public-sector":
         docs.append("impact-analysis")
     return unique(docs)
 
@@ -630,10 +638,17 @@ def default_interview_mode(project_nature: str, constraint_mode: str) -> str:
     return "guided-review" if project_nature == "production" else "quick-start"
 
 
-def print_baseline_summary(project_family: str, project_nature: str, runtime_roles: list[str], defaults: dict) -> None:
+def print_baseline_summary(
+    project_family: str,
+    project_nature: str,
+    runtime_roles: list[str],
+    organization_profile: str,
+    defaults: dict,
+) -> None:
     print_header("추천 baseline")
     print(f"- project family: {project_family}")
     print(f"- project nature: {project_nature}")
+    print(f"- organization profile: {organization_profile}")
     print(f"- runtime roles: {', '.join(runtime_roles)}")
     print(f"- repository mode: {defaults['repositoryMode']}")
     print(f"- language / framework: {defaults['language']} / {defaults['framework']}")
@@ -645,6 +660,8 @@ def print_baseline_summary(project_family: str, project_nature: str, runtime_rol
     integrations = ", ".join(defaults["externalIntegrations"]) or "없음"
     print(f"- external integrations: {integrations}")
     print("이 baseline은 일반적인 quick-start를 위한 기본 추천이며, production 또는 운영 이슈는 이후 review 단계에서 확장한다.")
+    if organization_profile == "egov-public-sector":
+        print("공공/전자정부 profile이 선택되어 공공 가이드, KRDS/접근성, parity/impact-analysis 경로를 후속 문서에 함께 남긴다.")
 
 
 def build_interactive_spec(args: argparse.Namespace) -> tuple[dict, Path, Path]:
@@ -654,6 +671,9 @@ def build_interactive_spec(args: argparse.Namespace) -> tuple[dict, Path, Path]:
     project_purpose = prompt_text("프로젝트 목적")
     project_family = prompt_choice("프로젝트 패밀리", PROJECT_FAMILIES)
     project_nature = prompt_choice("프로젝트 성격", PROJECT_NATURES, "prototype")
+    organization_profile = prompt_choice("조직/도메인 profile", ORGANIZATION_PROFILE_OPTIONS, "none")
+    if organization_profile not in ORGANIZATION_PROFILES:
+        organization_profile = "none"
 
     family_detail_defaults = family_defaults(project_family, project_nature)
     runtime_roles = prompt_multi("런타임 역할", RUNTIME_ROLES, family_detail_defaults["runtimeRoles"])
@@ -673,7 +693,7 @@ def build_interactive_spec(args: argparse.Namespace) -> tuple[dict, Path, Path]:
         print("고정 운영 제약이 있으면 runtime/framework/deployment를 직접 확인해야 하므로 guided-review로 전환합니다.")
         interview_mode = "guided-review"
     if interview_mode == "quick-start":
-        print_baseline_summary(project_family, project_nature, runtime_roles, recommended_defaults)
+        print_baseline_summary(project_family, project_nature, runtime_roles, organization_profile, recommended_defaults)
         if not prompt_yes_no("위 baseline을 그대로 채우고 계속할까요?", True):
             interview_mode = "guided-review"
 
@@ -732,6 +752,7 @@ def build_interactive_spec(args: argparse.Namespace) -> tuple[dict, Path, Path]:
         "projectPurpose": project_purpose,
         "projectFamily": project_family,
         "projectNature": project_nature,
+        "organizationProfile": organization_profile,
         "repositoryMode": repository_mode,
         "targetUsers": target_users,
         "targetPlatforms": target_platforms,
@@ -812,6 +833,7 @@ def print_summary(spec: dict, output_root: Path, spec_path: Path) -> None:
     print("선택 결과")
     print(f"- template: {template_name}")
     print(f"- constraint mode: {spec.get('constraintMode', 'recommended-baseline')}")
+    print(f"- organization profile: {spec.get('organizationProfile', 'none')}")
     print(f"- scaffold profile: {scaffold_profile or 'docs-only'}")
     print(f"- scaffold support level: {support_level}")
     if scaffold_plan["reason"]:

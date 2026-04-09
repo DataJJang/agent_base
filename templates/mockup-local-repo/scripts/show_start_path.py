@@ -380,26 +380,35 @@ def evaluate_model_tier(policy: dict | None, model_context: dict) -> dict:
     return result
 
 
-def minimal_entry_files(mode: str) -> list[str]:
+def minimal_entry_files(mode: str, organization_profile: str = "none") -> list[str]:
     if mode == "lite":
-        return [
+        files = [
             "AGENTS.md",
             ".agent-base/context-manifest.json",
             "docs/ai/command-catalog.md",
         ]
+        if organization_profile == "egov-public-sector":
+            files.append("docs/ai/org-specific/egov-public-sector-guide.md")
+        return files
     if mode == "coordinated":
-        return [
+        files = [
             "AGENTS.md",
             ".agent-base/context-manifest.json",
             ".agent-base/refinement-manifest.json",
             ".agent-base/agent-workboard.json",
         ]
-    return [
+        if organization_profile == "egov-public-sector":
+            files.append("docs/ai/org-specific/egov-public-sector-guide.md")
+        return files
+    files = [
         "AGENTS.md",
         ".agent-base/context-manifest.json",
         ".agent-base/agent-role-plan.json",
         ".agent-base/agent-workboard.json",
     ]
+    if organization_profile == "egov-public-sector":
+        files.append("docs/ai/org-specific/egov-public-sector-guide.md")
+    return files
 
 
 def make_action(
@@ -424,7 +433,7 @@ def build_actions(mode: str, state: dict) -> list[dict]:
         make_action(
             "Review the minimal entry files",
             "Start from the lightest doc set that still matches the current coordination cost.",
-            files=minimal_entry_files(mode),
+            files=minimal_entry_files(mode, state.get("organizationProfile", "none")),
         )
     ]
 
@@ -627,6 +636,8 @@ def build_report(
 
     state = {
         "repoRoot": relative_to_repo(repo_root, repo_root),
+        "organizationProfile": context_manifest.get("organizationProfile")
+        or (generation_manifest or {}).get("organizationProfile", "none"),
         "blockingHighPriorityModules": blocking,
         "designReady": design_ready,
         "designFreezeStatus": design_lane.get("status", "-") if design_lane else "-",
@@ -663,6 +674,7 @@ def print_report(report: dict) -> None:
     print("Starter Path")
     print(f"- Mode: {report['label']}")
     print(f"- Summary: {report['summary']}")
+    print(f"- Organization profile: {report['state'].get('organizationProfile') or 'none'}")
     print(
         "- Blocking high-priority refinement modules: "
         + (", ".join(report["state"]["blockingHighPriorityModules"]) or "none")

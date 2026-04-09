@@ -21,6 +21,7 @@
   - `web-app`, `backend-service`, `batch-worker`, `receiver-integration`, `mockup-local`
 - 전자정부 프로젝트라고 해서 별도 family를 억지로 만들지 않는다.
 - 대신 아래 3가지를 우선 적용한다.
+  - `organizationProfile = egov-public-sector`
   - `constraintMode`
   - `legacy-exception-policy`
   - `compatibility / parity / migration` 문서 세트
@@ -54,6 +55,8 @@
 
 - `repositoryMode`
   - 기본은 `single-repo`
+- `organizationProfile`
+  - 기본은 `egov-public-sector`
 - `constraintMode`
   - 신규지만 발주/운영 기준이 강하게 고정돼 있으면 `fixed-target`
   - 기존 전자정부 유지보수/고도화면 `legacy-maintenance`

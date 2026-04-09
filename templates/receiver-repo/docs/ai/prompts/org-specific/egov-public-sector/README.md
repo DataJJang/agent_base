@@ -2,6 +2,8 @@
 
 이 디렉토리는 `전자정부프레임워크`, `공공기관 웹서비스`, `KRDS/UI·UX 기준`, `brownfield migration` 성격이 강한 프로젝트에서만 쓰는 선택형 prompt pack이다.
 
+보통은 spec 또는 bootstrap 인터뷰에서 `organizationProfile = egov-public-sector`로 기록하고 이 pack을 활성화한다.
+
 사용 기준:
 
 - 공통 prompt만으로는 공공 프로젝트 특유의 질문 순서와 제약 확인이 부족할 때

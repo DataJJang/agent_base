@@ -23,6 +23,11 @@ CONSTRAINT_MODES = {
     "legacy-maintenance",
 }
 
+ORGANIZATION_PROFILES = {
+    "none",
+    "egov-public-sector",
+}
+
 TEMPLATE_BY_FAMILY = {
     "game": "game-repo",
     "web-app": "web-app-repo",
@@ -493,6 +498,11 @@ def normalize_constraint_mode(value: object) -> str:
     return candidate if candidate in CONSTRAINT_MODES else "recommended-baseline"
 
 
+def normalize_organization_profile(value: object) -> str:
+    candidate = str(value or "").strip() or "none"
+    return candidate if candidate in ORGANIZATION_PROFILES else "none"
+
+
 def parse_major_version(value: object) -> int | None:
     match = re.search(r"\d+", str(value or ""))
     if not match:
@@ -593,6 +603,9 @@ def validate_spec(spec: dict) -> None:
     if spec.get("constraintMode") not in CONSTRAINT_MODES:
         raise ValueError(f"Unsupported constraintMode: {spec.get('constraintMode')}")
 
+    if spec.get("organizationProfile") not in ORGANIZATION_PROFILES:
+        raise ValueError(f"Unsupported organizationProfile: {spec.get('organizationProfile')}")
+
     if not isinstance(spec.get("hardConstraints"), dict):
         raise ValueError("hardConstraints must be an object")
 
@@ -678,6 +691,15 @@ def derive_agent_coordination(spec: dict) -> dict[str, list[str]]:
     if not release_needed:
         optional = [role for role in optional if role != "release-manager"]
 
+    if spec.get("organizationProfile") == "egov-public-sector":
+        if "compatibility-reviewer" not in required and "compatibility-reviewer" not in optional:
+            optional.append("compatibility-reviewer")
+        if spec.get("constraintMode") != "recommended-baseline":
+            if "refactor-guardian" not in required and "refactor-guardian" not in optional:
+                optional.append("refactor-guardian")
+        if spec.get("securityProfile") == "없음" and "security-reviewer" not in required and "security-reviewer" not in optional:
+            optional.append("security-reviewer")
+
     workflow = [
         role
         for role in [
@@ -757,6 +779,7 @@ def derive_coordination_mode(spec: dict) -> dict[str, object]:
 def derive_context_manifest(spec: dict) -> dict:
     mode = "bootstrap"
     coordination_mode = derive_coordination_mode(spec)
+    organization_profile = spec.get("organizationProfile", "none")
     fast_path_docs = [
         "AGENTS.md",
         "docs/ai/context-profiles.md",
@@ -776,12 +799,23 @@ def derive_context_manifest(spec: dict) -> dict:
         deep_path_docs.append("docs/ai/database-rules.md")
     if spec.get("projectNature") == "production" or spec.get("deploymentType") != "local-only":
         deep_path_docs.append("docs/ai/lifecycle.md")
+    if organization_profile == "egov-public-sector":
+        fast_path_docs.append("docs/ai/org-specific/egov-public-sector-guide.md")
+        deep_path_docs.extend(
+            [
+                "docs/ai/prompts/org-specific/egov-public-sector/README.md",
+                "docs/ai/repository-inventory.md",
+            ]
+        )
+        if "frontend" in spec.get("runtimeRoles", []) or spec.get("projectFamily") in {"web-app", "pwa", "mockup-local"}:
+            deep_path_docs.append("checklists/public-sector-ui-review.md")
 
     return {
         "mode": mode,
         "projectFamily": spec["projectFamily"],
+        "organizationProfile": organization_profile,
         "runtimeRoles": spec.get("runtimeRoles", []),
-        "fastPathDocs": fast_path_docs,
+        "fastPathDocs": unique(fast_path_docs),
         "deepPathDocs": unique(deep_path_docs),
         "recommendedCoordinationMode": coordination_mode["mode"],
         "coordinationModeSummary": coordination_mode["summary"],
@@ -896,6 +930,7 @@ def derive_model_routing(spec: dict, role_plan: dict, refinement_manifest: dict,
         "version": 1,
         "repositoryName": spec["repositoryName"],
         "projectFamily": spec["projectFamily"],
+        "organizationProfile": spec.get("organizationProfile", "none"),
         "policyMode": "soft-recommendation-with-warning",
         "tierDefinitions": [
             {
@@ -963,6 +998,7 @@ def derive_refinement_manifest(spec: dict, scaffold_profile: str | None, support
     modules: list[dict] = []
     target_environments = spec.get("targetEnvironments", [])
     environment_labels = ", ".join(target_environments) or "local"
+    organization_profile = spec.get("organizationProfile", "none")
 
     modules.append(
         make_refinement_module(
@@ -992,6 +1028,42 @@ def derive_refinement_manifest(spec: dict, scaffold_profile: str | None, support
         )
     )
     modules.append(runtime_refinement_module(spec))
+
+    if organization_profile == "egov-public-sector":
+        public_priority = "high" if (
+            spec.get("constraintMode") != "recommended-baseline"
+            or "frontend" in spec.get("runtimeRoles", [])
+            or spec.get("projectFamily") in {"web-app", "pwa", "mockup-local"}
+        ) else "medium"
+        modules.append(
+            make_refinement_module(
+                module_id="public-sector-profile",
+                title="Public-Sector Profile Alignment",
+                priority=public_priority,
+                trigger_reason="organizationProfile is `egov-public-sector`.",
+                questions=[
+                    "전자정부/KRDS 기준에서 먼저 맞춰야 할 문서와 검증 항목은 무엇인가?",
+                    "공통컴포넌트, 공통 자산, parity/rollback 중 어느 축이 현재 저장소에서 가장 중요한가?",
+                    "공공 UI, 접근성, 운영 반영 절차를 어떤 체크리스트와 prompt로 고정할 것인가?",
+                ],
+                recommended_outputs=[
+                    "docs/ai/org-specific/egov-public-sector-guide.md",
+                    "checklists/public-sector-ui-review.md",
+                    "compatibility matrix or parity validation note",
+                ],
+                recommended_prompts=[
+                    "egov-bootstrap",
+                    "egov-adoption",
+                    "egov-ui-accessibility-review",
+                    "egov-public-form-list-review",
+                ],
+                agent_roles=["bootstrap-planner", "compatibility-reviewer", "docs-operator"],
+                done_when=[
+                    "organization-specific public-sector review path is explicit",
+                    "KRDS/accessibility/parity or legacy constraints are either documented or intentionally deferred",
+                ],
+            )
+        )
 
     if spec.get("exceptions") or spec.get("constraintMode") != "recommended-baseline":
         modules.append(
@@ -1238,6 +1310,7 @@ def derive_refinement_manifest(spec: dict, scaffold_profile: str | None, support
     return {
         "version": 1,
         "projectFamily": spec["projectFamily"],
+        "organizationProfile": organization_profile,
         "repositoryName": spec["repositoryName"],
         "scaffoldProfile": scaffold_profile,
         "supportLevel": support_level,
@@ -1673,6 +1746,7 @@ def derive_agent_workboard(
         "version": 1,
         "repositoryName": spec["repositoryName"],
         "projectFamily": spec["projectFamily"],
+        "organizationProfile": spec.get("organizationProfile", "none"),
         "summary": {
             "designReady": design_ready,
             "blockingHighPriorityModuleIds": high_priority_pending,
@@ -1705,6 +1779,7 @@ def derive_agent_workboard(
 def normalize_spec(spec: dict) -> dict:
     normalized = dict(spec)
     normalized["constraintMode"] = normalize_constraint_mode(normalized.get("constraintMode"))
+    normalized["organizationProfile"] = normalize_organization_profile(normalized.get("organizationProfile"))
     normalized["hardConstraints"] = normalize_hard_constraints(normalized.get("hardConstraints"))
     derived = derive_agent_coordination(normalized)
     for key, value in derived.items():
@@ -1910,6 +1985,7 @@ def write_root_readme(
     provenance: dict,
 ) -> None:
     coordination_mode = derive_coordination_mode(spec)
+    organization_profile = spec.get("organizationProfile", "none")
     starter_command = "python3 scripts/show_start_path.py"
     if coordination_mode["mode"] == "lite":
         next_steps = [
@@ -1947,6 +2023,7 @@ def write_root_readme(
 
 - Repository: `{spec['repositoryName']}`
 - Project family: `{spec['projectFamily']}`
+- Organization profile: `{organization_profile}`
 - Project nature: `{spec['projectNature']}`
 - Constraint mode: `{spec.get('constraintMode', 'recommended-baseline')}`
 - Repository mode: `{spec['repositoryMode']}`
@@ -1963,6 +2040,7 @@ def write_root_readme(
 - Scaffold profile: `{scaffold_profile or 'docs-only'}`
 - Scaffold support level: `{support_level}`
 {f"- Scaffold support note: {support_reason}" if support_reason else ""}
+{f"- Organization profile guide: `docs/ai/org-specific/egov-public-sector-guide.md`" if organization_profile == "egov-public-sector" else ""}
 
 ## Foundry Provenance
 
@@ -1990,6 +2068,7 @@ Why this mode:
 
 이 명령은 현재 저장소의 추천 mode, blocking refinement, workboard 상태를 읽고 지금 바로 할 3가지 액션만 보여준다.
 또한 `.agent-base/generation-manifest.json`을 함께 보면 이 저장소를 만든 foundry baseline과 commit provenance를 확인할 수 있다.
+`organizationProfile`이 `egov-public-sector`라면 `docs/ai/org-specific/egov-public-sector-guide.md`와 공공 UI checklist/prompt를 먼저 같이 보는 편이 안전하다.
 현재 사용하는 AI 모델 tier를 알고 있으면 `.agent-base/model-routing.json`과 같이 비교하도록 AI에게 요청하거나 아래처럼 helper에 직접 넘길 수 있다.
 
 ```bash
@@ -2232,7 +2311,10 @@ def write_generation_artifacts(
         "foundryTag": provenance["foundryTag"],
         "latestKnownTag": provenance["latestKnownTag"],
         "foundryDirty": provenance["foundryDirty"],
+        "repositoryName": spec["repositoryName"],
+        "projectFamily": spec["projectFamily"],
         "template": template_name,
+        "organizationProfile": spec.get("organizationProfile", "none"),
         "scaffoldProfile": scaffold_profile,
         "supportLevel": support_level,
         "scaffoldSupportReason": support_reason,

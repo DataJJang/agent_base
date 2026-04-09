@@ -4,6 +4,7 @@
   "projectPurpose": "Provide a starter Unity-based game prototype.",
   "projectFamily": "game",
   "projectNature": "prototype",
+  "organizationProfile": "none",
   "constraintMode": "recommended-baseline",
   "hardConstraints": {
     "operatingEnvironment": "",

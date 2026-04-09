@@ -38,23 +38,26 @@ CLI는 아래 순서로 질문한다.
 3. 프로젝트 목적
 4. 프로젝트 패밀리
 5. 프로젝트 성격
-6. 런타임 역할
-7. 운영 제약 모드
+6. 조직/도메인 profile
+  - `none`
+  - `egov-public-sector`
+7. 런타임 역할
+8. 운영 제약 모드
   - `recommended-baseline`
   - `fixed-target`
   - `legacy-maintenance`
-8. 입력 방식 선택
+9. 입력 방식 선택
   - `quick-start`
   - `guided-review`
   - `full-detail`
-9. `quick-start`면 추천 baseline을 보여주고 대부분의 값을 자동 채운다.
-10. `fixed-target` 또는 `legacy-maintenance`면 고정 운영 환경, OS, runtime/framework policy, container 허용 여부를 먼저 확인한다.
-11. `guided-review` 또는 `full-detail`이면 저장소 구성 방식부터 세부 항목을 순서대로 확인한다.
-12. DB 관련 추가 항목
-13. 기본 문서 세트
-14. 추가 예외/메모
-15. output root
-16. spec 저장 경로
+10. `quick-start`면 추천 baseline을 보여주고 대부분의 값을 자동 채운다.
+11. `fixed-target` 또는 `legacy-maintenance`면 고정 운영 환경, OS, runtime/framework policy, container 허용 여부를 먼저 확인한다.
+12. `guided-review` 또는 `full-detail`이면 저장소 구성 방식부터 세부 항목을 순서대로 확인한다.
+13. DB 관련 추가 항목
+14. 기본 문서 세트
+15. 추가 예외/메모
+16. output root
+17. spec 저장 경로
 
 핵심 의도는 `최종 spec에는 값이 있어야 하지만, 초기 인터뷰에서 사용자가 모든 값을 같은 무게로 직접 입력하지는 않아도 된다`는 점이다.
 
@@ -65,6 +68,7 @@ CLI는 아래를 만든다.
 - 정규화된 spec JSON
 - spec 옆 `*.refinement.json`
 - spec 옆 `*.refinement-status.json`
+- `organizationProfile` 기반 overlay 문서 라우팅
 - 자동 파생된 `requiredAgentRoles`, `optionalAgentRoles`, `roleSpecializations`, `agentWorkflowOrder`
 - 선택된 template 이름
 - 선택된 scaffold profile 이름
@@ -75,6 +79,7 @@ CLI는 아래를 만든다.
 
 spec은 `.agent-base/project-generation-spec.json`으로도 생성 저장소 안에 다시 남고, generator는 `.agent-base/generation-manifest.json`, `.agent-base/context-manifest.json`, `.agent-base/agent-role-plan.json`, `.agent-base/refinement-manifest.json`, `.agent-base/refinement-status.json`, `.agent-base/agent-workboard.json`, `.agent-base/model-routing.json`, `docs/ai/agent-handoff-log.md`를 같이 만든다. 이 중 `.agent-base/context-manifest.json`과 root `README.md`에는 추천 coordination mode와 이유가 같이 들어간다.
 또한 생성된 저장소에는 `scripts/show_start_path.py`가 들어가며, 현재 repo state 기준 top 3 action, model tier warning, foundry provenance를 바로 보여줄 수 있다.
+`organizationProfile`이 `egov-public-sector`라면 `context-manifest`, `generation-manifest`, root `README.md`에서 그 profile과 공공 특화 guide 경로를 같이 확인할 수 있다.
 
 ## 6. 주의사항
 

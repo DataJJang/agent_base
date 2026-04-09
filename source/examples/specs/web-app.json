@@ -4,6 +4,7 @@
   "projectPurpose": "Provide a starter browser application for internal operators.",
   "projectFamily": "web-app",
   "projectNature": "prototype",
+  "organizationProfile": "none",
   "constraintMode": "recommended-baseline",
   "hardConstraints": {
     "operatingEnvironment": "",

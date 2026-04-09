@@ -4,6 +4,7 @@
   "projectPurpose": "Provide a starter backend API for internal services.",
   "projectFamily": "backend-service",
   "projectNature": "prototype",
+  "organizationProfile": "none",
   "constraintMode": "recommended-baseline",
   "hardConstraints": {
     "operatingEnvironment": "",

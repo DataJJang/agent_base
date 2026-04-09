@@ -12,6 +12,7 @@
 - `runtimeRole[]`와 `projectFamily`는 required/optional agent 역할과 specialization을 자동 파생하는 기준이다.
 - `repositoryMode`는 생성기 출력의 한계와 후속 오버레이 범위를 결정한다.
 - `constraintMode`와 `hardConstraints`는 scaffold 적용 가능 여부를 baseline보다 먼저 결정한다.
+- `organizationProfile`은 family를 바꾸지 않고 조직/도메인 overlay 문서, prompt pack, refinement를 켜는 기준이다.
 - `projectNature`, `deploymentType`, `datastore`, `cache`는 생성해야 할 문서 종류를 제한하거나 확장한다.
 - `production` 또는 외부 사용자 대상이면 운영/배포/보안 문서는 필수다.
 
@@ -28,6 +29,15 @@
 | `receiver-integration` | `templates/receiver-integration-repo` | bootstrap, build-guide, test-plan, operations-manual | gradle compile and test, payload smoke |
 | `mockup-local` | `templates/mockup-local-repo` | bootstrap, build-guide, test-plan | local preview and walkthrough |
 | `library-tooling` | `templates/library-tooling-repo` | bootstrap, build-guide, test-plan | package build and sample invocation |
+
+## 3.2 organization profile 매핑
+
+| organizationProfile | 의미 | family 영향 | 추가 overlay |
+| --- | --- | --- | --- |
+| `none` | 공통 baseline만 사용 | 없음 | 없음 |
+| `egov-public-sector` | 전자정부/KRDS/공공 SI overlay | family는 유지 | eGov guide, 공공 UI checklist, org-specific prompt pack, public-sector refinement |
+
+`egov-public-sector`는 별도 family가 아니다. 즉, `web-app`, `backend-service`, `batch-worker` 같은 공통 family를 고른 뒤 공공 프로젝트에 필요한 문서와 refinement만 추가로 활성화한다.
 
 ## 3.1 기본 scaffold profile 매핑
 
@@ -83,6 +93,7 @@
 - `projectNature == production`이면 `operations-manual`, `release-and-rollback`, `quality-gates` 검토를 필수로 한다.
 - `cache != 없음`이면 config와 deploy-check 문서에 cache 의존성을 명시한다.
 - `securityProfile != 없음`이면 보안 baseline과 인증 방식 문서를 같이 만든다.
+- `organizationProfile == egov-public-sector`이면 `org-specific/egov-public-sector-guide.md`, 공공 UI checklist/prompt, public-sector refinement를 추가한다.
 
 ## 6. 생성기 출력 규칙
 

@@ -4,6 +4,7 @@
   "projectPurpose": "Maintain a backend service that must still run on a locked legacy server.",
   "projectFamily": "backend-service",
   "projectNature": "internal-tool",
+  "organizationProfile": "none",
   "constraintMode": "fixed-target",
   "hardConstraints": {
     "operatingEnvironment": "2010-era on-prem server",

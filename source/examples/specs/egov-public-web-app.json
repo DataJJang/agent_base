@@ -1,0 +1,60 @@
+{
+  "repositoryName": "sample-egov-public-web-app",
+  "projectName": "Sample eGov Public Web App",
+  "projectPurpose": "Provide a starter public-facing web application aligned to KRDS and public-sector delivery expectations.",
+  "projectFamily": "web-app",
+  "projectNature": "prototype",
+  "organizationProfile": "egov-public-sector",
+  "constraintMode": "recommended-baseline",
+  "hardConstraints": {
+    "operatingEnvironment": "",
+    "operatingSystemVersion": "",
+    "runtimeVersionPolicy": "",
+    "frameworkVersionPolicy": "",
+    "containerAllowed": null,
+    "blockCurrentBaselineScaffold": false,
+    "notes": []
+  },
+  "repositoryMode": "single-repo",
+  "targetUsers": [
+    "citizens",
+    "public-operators"
+  ],
+  "targetPlatforms": [
+    "browser"
+  ],
+  "runtimeRoles": [
+    "frontend"
+  ],
+  "language": "TypeScript",
+  "runtimeVersion": "22 LTS",
+  "framework": "React",
+  "buildTool": "npm",
+  "testTool": "npm test",
+  "datastore": "없음",
+  "cache": "없음",
+  "deploymentType": "static-hosting",
+  "startupMode": "SPA",
+  "loggingMode": "console",
+  "targetOs": [
+    "Windows",
+    "macOS",
+    "Linux"
+  ],
+  "securityProfile": "없음",
+  "targetEnvironments": [
+    "local",
+    "dev"
+  ],
+  "externalIntegrations": [
+    "backend-service",
+    "public-auth"
+  ],
+  "baseDocumentSet": [
+    "README",
+    "build-guide",
+    "test-plan",
+    "impact-analysis"
+  ],
+  "exceptions": []
+}
