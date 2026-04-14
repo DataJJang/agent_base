@@ -13,6 +13,7 @@
 - `repositoryMode`는 생성기 출력의 한계와 후속 오버레이 범위를 결정한다.
 - `constraintMode`와 `hardConstraints`는 scaffold 적용 가능 여부를 baseline보다 먼저 결정한다.
 - `organizationProfile`은 family를 바꾸지 않고 조직/도메인 overlay 문서, prompt pack, refinement를 켜는 기준이다.
+- `organizationProfile = egov-public-sector`이면 `deliveryDevopsProfile`로 형상관리, CI, artifact, 배포 실행 모델 기준도 함께 기록한다.
 - `projectNature`, `deploymentType`, `datastore`, `cache`는 생성해야 할 문서 종류를 제한하거나 확장한다.
 - `production` 또는 외부 사용자 대상이면 운영/배포/보안 문서는 필수다.
 
@@ -40,6 +41,7 @@
 `egov-public-sector`는 별도 family가 아니다. 즉, `web-app`, `backend-service`, `batch-worker` 같은 공통 family를 고른 뒤 공공 프로젝트에 필요한 문서와 refinement만 추가로 활성화한다.
 
 공공 `web-app`은 추가로 `frontendArchitecturePolicy`를 함께 기록한다. 즉 `egov-public-sector`는 overlay이고, JSP 여부나 FE/BE 분리 여부는 RFP와 `frontendArchitecturePolicy`가 결정한다.
+같은 overlay에서 `deliveryDevopsProfile`도 같이 기록한다. 즉 `Git/SVN`, `Jenkins/GitHub Actions`, `artifact 형식`, `반입/배포 실행`, `승인/rollback owner`를 문서가 아니라 spec에 남기는 방향을 기본으로 둔다.
 
 ## 3.1 기본 scaffold profile 매핑
 

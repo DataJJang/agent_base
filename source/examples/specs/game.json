@@ -27,6 +27,28 @@
     "client",
     "tooling"
   ],
+  "frontendArchitecturePolicy": "not-applicable",
+  "publicWebConstraints": {
+    "seoSensitivity": "not-applicable",
+    "pageDeliveryPolicy": "not-applicable",
+    "ajaxPolicy": "not-applicable",
+    "crossBrowserParityRequired": null,
+    "mobileParityRequired": null,
+    "legacyBrowserSupport": "not-applicable",
+    "frontendFrameworkAllowed": [],
+    "notes": []
+  },
+  "deliveryDevopsProfile": {
+    "sourceControl": "not-applicable",
+    "ciSystem": "not-applicable",
+    "artifactType": "not-applicable",
+    "artifactRepository": "not-applicable",
+    "deploymentExecutionModel": "not-applicable",
+    "releaseApprovalMode": "not-applicable",
+    "smokeOwner": "",
+    "rollbackOwner": "",
+    "notes": []
+  },
   "language": "C#",
   "runtimeVersion": "Unity LTS",
   "framework": "Unity",

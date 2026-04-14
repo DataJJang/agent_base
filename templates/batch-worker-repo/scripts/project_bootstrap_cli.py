@@ -18,10 +18,12 @@ from generate_project import (
     derive_refinement_status,
     generate_project,
     normalize_constraint_mode,
+    normalize_delivery_devops_profile,
     normalize_frontend_architecture_policy,
     normalize_hard_constraints,
     normalize_public_web_constraints,
     normalize_spec,
+    summarize_delivery_devops_profile,
     validate_spec,
 )
 
@@ -176,6 +178,54 @@ LEGACY_BROWSER_SUPPORT_OPTION_VALUES = [
     "rfp-dependent",
     "required",
     "not-required",
+]
+
+SOURCE_CONTROL_OPTION_VALUES = [
+    "Git",
+    "SVN",
+    "mixed",
+    "undecided",
+]
+
+CI_SYSTEM_OPTION_VALUES = [
+    "Jenkins",
+    "GitHub Actions",
+    "GitLab CI",
+    "manual-only",
+    "other",
+    "undecided",
+]
+
+ARTIFACT_TYPE_OPTION_VALUES = [
+    "war",
+    "jar",
+    "docker-image",
+    "static-bundle",
+    "undecided",
+]
+
+ARTIFACT_REPOSITORY_OPTION_VALUES = [
+    "Nexus",
+    "container-registry",
+    "shared-storage",
+    "package-registry",
+    "other",
+    "undecided",
+]
+
+DEPLOYMENT_EXECUTION_MODEL_OPTION_VALUES = [
+    "manual-was-deploy",
+    "manual-file-handover",
+    "pipeline-to-vm",
+    "pipeline-to-container-platform",
+    "undecided",
+]
+
+RELEASE_APPROVAL_MODE_OPTION_VALUES = [
+    "operator-approval",
+    "pipeline-approval",
+    "change-request",
+    "undecided",
 ]
 
 DOCUMENT_SET_OPTIONS = [
@@ -604,6 +654,15 @@ def apply_frontend_architecture_defaults(project_family: str, organization_profi
     return adjusted
 
 
+def apply_delivery_devops_defaults(defaults: dict) -> dict:
+    adjusted = dict(defaults)
+    adjusted["deliveryDevopsProfile"] = normalize_delivery_devops_profile(
+        adjusted.get("deliveryDevopsProfile"),
+        adjusted,
+    )
+    return adjusted
+
+
 def derive_base_document_set(spec: dict) -> list[str]:
     docs = ["README", "build-guide", "test-plan"]
     if spec["deploymentType"] != "local-only":
@@ -641,6 +700,23 @@ def detect_exceptions(spec: dict, family_defaults: dict) -> list[str]:
         exceptions.append(
             "repositoryMode is not `single-repo`; generator v1 still creates one sample repository and requires manual expansion."
         )
+    actual_delivery_profile = normalize_delivery_devops_profile(spec.get("deliveryDevopsProfile"), spec)
+    default_delivery_profile = normalize_delivery_devops_profile(
+        family_defaults.get("deliveryDevopsProfile"),
+        family_defaults,
+    )
+    for key in [
+        "sourceControl",
+        "ciSystem",
+        "artifactType",
+        "artifactRepository",
+        "deploymentExecutionModel",
+        "releaseApprovalMode",
+    ]:
+        default = default_delivery_profile.get(key)
+        actual = actual_delivery_profile.get(key)
+        if default and actual and actual != default:
+            exceptions.append(f"deliveryDevopsProfile.{key} uses `{actual}` instead of family default `{default}`")
     return exceptions
 
 
@@ -805,6 +881,55 @@ def prompt_public_web_constraints(
     )
 
 
+def prompt_delivery_devops_profile(
+    spec_inputs: dict,
+    defaults: dict,
+    interview_mode: str,
+) -> dict:
+    normalized_defaults = normalize_delivery_devops_profile(defaults, spec_inputs)
+    if spec_inputs.get("organizationProfile") != "egov-public-sector":
+        return normalized_defaults
+    if interview_mode == "quick-start":
+        return normalized_defaults
+
+    print_header("공공 배포 / DevOps / 형상관리")
+    source_control = prompt_choice("형상관리 기준", SOURCE_CONTROL_OPTION_VALUES, normalized_defaults["sourceControl"])
+    ci_system = prompt_choice("CI 시스템", CI_SYSTEM_OPTION_VALUES, normalized_defaults["ciSystem"])
+    artifact_type = prompt_choice("Artifact 형식", ARTIFACT_TYPE_OPTION_VALUES, normalized_defaults["artifactType"])
+    artifact_repository = prompt_choice(
+        "Artifact 저장소",
+        ARTIFACT_REPOSITORY_OPTION_VALUES,
+        normalized_defaults["artifactRepository"],
+    )
+    deployment_execution_model = prompt_choice(
+        "배포 실행 모델",
+        DEPLOYMENT_EXECUTION_MODEL_OPTION_VALUES,
+        normalized_defaults["deploymentExecutionModel"],
+    )
+    release_approval_mode = prompt_choice(
+        "릴리즈 승인 방식",
+        RELEASE_APPROVAL_MODE_OPTION_VALUES,
+        normalized_defaults["releaseApprovalMode"],
+    )
+    smoke_owner = prompt_text("Smoke owner", normalized_defaults["smokeOwner"], required=False)
+    rollback_owner = prompt_text("Rollback owner", normalized_defaults["rollbackOwner"], required=False)
+    notes = prompt_list("배포 / DevOps 메모 (쉼표 구분, 없으면 Enter)", normalized_defaults["notes"])
+    return normalize_delivery_devops_profile(
+        {
+            "sourceControl": source_control,
+            "ciSystem": ci_system,
+            "artifactType": artifact_type,
+            "artifactRepository": artifact_repository,
+            "deploymentExecutionModel": deployment_execution_model,
+            "releaseApprovalMode": release_approval_mode,
+            "smokeOwner": smoke_owner,
+            "rollbackOwner": rollback_owner,
+            "notes": notes,
+        },
+        spec_inputs,
+    )
+
+
 def family_defaults(
     project_family: str,
     project_nature: str,
@@ -825,7 +950,8 @@ def family_defaults(
         organization_profile,
         defaults["frontendArchitecturePolicy"],
     )
-    return apply_frontend_architecture_defaults(project_family, organization_profile, defaults)
+    defaults = apply_frontend_architecture_defaults(project_family, organization_profile, defaults)
+    return apply_delivery_devops_defaults(defaults)
 
 
 def recommended_security_profile(project_family: str, runtime_roles: list[str], family_default: str) -> str:
@@ -919,6 +1045,10 @@ def print_baseline_summary(
         organization_profile,
         defaults.get("frontendArchitecturePolicy", "not-applicable"),
     )
+    delivery_devops_profile = normalize_delivery_devops_profile(
+        defaults.get("deliveryDevopsProfile"),
+        defaults,
+    )
     print_header("추천 baseline")
     print(f"- project family: {project_family}")
     print(f"- project nature: {project_nature}")
@@ -937,6 +1067,8 @@ def print_baseline_summary(
             f"- public web constraints: SEO {public_web_constraints['seoSensitivity']}, "
             f"page delivery {public_web_constraints['pageDeliveryPolicy']}, AJAX {public_web_constraints['ajaxPolicy']}"
         )
+    if organization_profile == "egov-public-sector":
+        print(f"- delivery / DevOps profile: {summarize_delivery_devops_profile(delivery_devops_profile)}")
     integrations = ", ".join(defaults["externalIntegrations"]) or "없음"
     print(f"- external integrations: {integrations}")
     print("이 baseline은 일반적인 quick-start를 위한 기본 추천이며, production 또는 운영 이슈는 이후 review 단계에서 확장한다.")
@@ -1069,6 +1201,19 @@ def build_interactive_spec(args: argparse.Namespace) -> tuple[dict, Path, Path]:
         active_defaults.get("publicWebConstraints", {}),
         interview_mode,
     )
+    delivery_devops_inputs = {
+        "projectFamily": project_family,
+        "organizationProfile": organization_profile,
+        "language": language,
+        "framework": framework,
+        "deploymentType": deployment_type,
+        "frontendArchitecturePolicy": frontend_architecture_policy,
+    }
+    delivery_devops_profile = prompt_delivery_devops_profile(
+        delivery_devops_inputs,
+        active_defaults.get("deliveryDevopsProfile", {}),
+        interview_mode,
+    )
 
     spec: dict = {
         "repositoryName": repository_name,
@@ -1083,6 +1228,7 @@ def build_interactive_spec(args: argparse.Namespace) -> tuple[dict, Path, Path]:
         "runtimeRoles": runtime_roles,
         "frontendArchitecturePolicy": frontend_architecture_policy,
         "publicWebConstraints": public_web_constraints,
+        "deliveryDevopsProfile": delivery_devops_profile,
         "language": language,
         "runtimeVersion": runtime_version,
         "framework": framework,
@@ -1160,6 +1306,7 @@ def print_summary(spec: dict, output_root: Path, spec_path: Path) -> None:
         spec.get("organizationProfile", "none"),
         spec.get("frontendArchitecturePolicy", "not-applicable"),
     )
+    delivery_devops_profile = normalize_delivery_devops_profile(spec.get("deliveryDevopsProfile"), spec)
     print()
     print("선택 결과")
     print(f"- template: {template_name}")
@@ -1174,6 +1321,8 @@ def print_summary(spec: dict, output_root: Path, spec_path: Path) -> None:
             f"- public web constraints: SEO {public_web_constraints['seoSensitivity']}, "
             f"page delivery {public_web_constraints['pageDeliveryPolicy']}, AJAX {public_web_constraints['ajaxPolicy']}"
         )
+    if spec.get("organizationProfile") == "egov-public-sector":
+        print(f"- delivery / DevOps profile: {summarize_delivery_devops_profile(delivery_devops_profile)}")
     print(f"- scaffold profile: {scaffold_profile or 'docs-only'}")
     print(f"- scaffold support level: {support_level}")
     if scaffold_plan["reason"]:

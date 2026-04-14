@@ -69,6 +69,60 @@ LEGACY_BROWSER_SUPPORT_OPTIONS = {
     "not-required",
 }
 
+SOURCE_CONTROL_POLICIES = {
+    "not-applicable",
+    "undecided",
+    "Git",
+    "SVN",
+    "mixed",
+}
+
+CI_SYSTEM_OPTIONS = {
+    "not-applicable",
+    "undecided",
+    "Jenkins",
+    "GitHub Actions",
+    "GitLab CI",
+    "manual-only",
+    "other",
+}
+
+ARTIFACT_TYPE_OPTIONS = {
+    "not-applicable",
+    "undecided",
+    "war",
+    "jar",
+    "docker-image",
+    "static-bundle",
+}
+
+ARTIFACT_REPOSITORY_OPTIONS = {
+    "not-applicable",
+    "undecided",
+    "Nexus",
+    "container-registry",
+    "shared-storage",
+    "package-registry",
+    "other",
+}
+
+DEPLOYMENT_EXECUTION_MODEL_OPTIONS = {
+    "not-applicable",
+    "undecided",
+    "manual-was-deploy",
+    "manual-file-handover",
+    "pipeline-to-vm",
+    "pipeline-to-container-platform",
+}
+
+RELEASE_APPROVAL_MODE_OPTIONS = {
+    "not-applicable",
+    "undecided",
+    "operator-approval",
+    "pipeline-approval",
+    "change-request",
+}
+
 TEMPLATE_BY_FAMILY = {
     "game": "game-repo",
     "web-app": "web-app-repo",
@@ -650,6 +704,108 @@ def normalize_public_web_constraints(
     return normalized
 
 
+def default_delivery_devops_profile(spec: dict) -> dict:
+    organization_profile = normalize_organization_profile(spec.get("organizationProfile"))
+    if organization_profile != "egov-public-sector":
+        return {
+            "sourceControl": "not-applicable",
+            "ciSystem": "not-applicable",
+            "artifactType": "not-applicable",
+            "artifactRepository": "not-applicable",
+            "deploymentExecutionModel": "not-applicable",
+            "releaseApprovalMode": "not-applicable",
+            "smokeOwner": "",
+            "rollbackOwner": "",
+            "notes": [],
+        }
+
+    project_family = str(spec.get("projectFamily") or "").strip()
+    language = str(spec.get("language") or "").strip().lower()
+    framework = str(spec.get("framework") or "").strip().lower()
+    deployment_type = str(spec.get("deploymentType") or "").strip()
+
+    artifact_type = "undecided"
+    if deployment_type == "container":
+        artifact_type = "docker-image"
+    elif project_family == "web-app" and language == "java":
+        artifact_type = "war"
+    elif project_family in {"web-app", "pwa", "mockup-local"} and language in {"typescript", "javascript"}:
+        artifact_type = "static-bundle"
+    elif project_family == "backend-service" and language == "java":
+        artifact_type = "war" if "egovframe" in framework else "jar"
+    elif project_family in {"batch-worker", "receiver-integration", "library-tooling"} and language == "java":
+        artifact_type = "jar"
+
+    artifact_repository = "undecided"
+    if artifact_type in {"war", "jar"}:
+        artifact_repository = "Nexus"
+    elif artifact_type == "docker-image":
+        artifact_repository = "container-registry"
+    elif artifact_type == "static-bundle":
+        artifact_repository = "shared-storage"
+
+    deployment_execution_model = "undecided"
+    if artifact_type == "docker-image":
+        deployment_execution_model = "pipeline-to-container-platform"
+    elif artifact_type == "static-bundle":
+        deployment_execution_model = "manual-file-handover"
+    elif artifact_type == "war":
+        deployment_execution_model = "manual-was-deploy"
+    elif artifact_type == "jar":
+        deployment_execution_model = "pipeline-to-vm"
+
+    return {
+        "sourceControl": "Git",
+        "ciSystem": "Jenkins",
+        "artifactType": artifact_type,
+        "artifactRepository": artifact_repository,
+        "deploymentExecutionModel": deployment_execution_model,
+        "releaseApprovalMode": "operator-approval",
+        "smokeOwner": "",
+        "rollbackOwner": "",
+        "notes": [],
+    }
+
+
+def normalize_delivery_devops_profile(value: object, spec: dict) -> dict:
+    normalized = default_delivery_devops_profile(spec)
+    if not isinstance(value, dict):
+        return normalized
+
+    option_map = {
+        "sourceControl": SOURCE_CONTROL_POLICIES,
+        "ciSystem": CI_SYSTEM_OPTIONS,
+        "artifactType": ARTIFACT_TYPE_OPTIONS,
+        "artifactRepository": ARTIFACT_REPOSITORY_OPTIONS,
+        "deploymentExecutionModel": DEPLOYMENT_EXECUTION_MODEL_OPTIONS,
+        "releaseApprovalMode": RELEASE_APPROVAL_MODE_OPTIONS,
+    }
+    for key, allowed_values in option_map.items():
+        candidate = str(value.get(key) or "").strip()
+        if candidate in allowed_values:
+            normalized[key] = candidate
+
+    for key in ["smokeOwner", "rollbackOwner"]:
+        candidate = value.get(key)
+        if candidate is not None and str(candidate).strip():
+            normalized[key] = str(candidate).strip()
+
+    notes = value.get("notes", [])
+    if isinstance(notes, list):
+        normalized["notes"] = unique([str(item).strip() for item in notes if str(item).strip()])
+    elif isinstance(notes, str) and notes.strip():
+        normalized["notes"] = [notes.strip()]
+    return normalized
+
+
+def summarize_delivery_devops_profile(profile: dict) -> str:
+    return (
+        f"SCM `{profile['sourceControl']}`, CI `{profile['ciSystem']}`, "
+        f"artifact `{profile['artifactType']}`, repository `{profile['artifactRepository']}`, "
+        f"deploy `{profile['deploymentExecutionModel']}`, approval `{profile['releaseApprovalMode']}`"
+    )
+
+
 def normalize_constraint_mode(value: object) -> str:
     candidate = str(value or "").strip() or "recommended-baseline"
     return candidate if candidate in CONSTRAINT_MODES else "recommended-baseline"
@@ -755,6 +911,7 @@ def validate_spec(spec: dict) -> None:
         "externalIntegrations",
         "frontendArchitecturePolicy",
         "publicWebConstraints",
+        "deliveryDevopsProfile",
         "baseDocumentSet",
     ]
     missing = [key for key in required if key not in spec]
@@ -782,6 +939,9 @@ def validate_spec(spec: dict) -> None:
     if not isinstance(spec.get("publicWebConstraints"), dict):
         raise ValueError("publicWebConstraints must be an object")
 
+    if not isinstance(spec.get("deliveryDevopsProfile"), dict):
+        raise ValueError("deliveryDevopsProfile must be an object")
+
     if spec["language"].lower() == "java" and not spec.get("packageName"):
         raise ValueError("packageName is required for Java-based scaffolds")
 
@@ -791,6 +951,19 @@ def validate_spec(spec: dict) -> None:
 
     if spec["projectFamily"] in {"web-app", "pwa"} and spec["frontendArchitecturePolicy"] == "not-applicable":
         raise ValueError("frontendArchitecturePolicy must be set for web-app and pwa projects")
+
+    delivery_devops_profile = normalize_delivery_devops_profile(spec.get("deliveryDevopsProfile"), spec)
+    option_map = {
+        "sourceControl": SOURCE_CONTROL_POLICIES,
+        "ciSystem": CI_SYSTEM_OPTIONS,
+        "artifactType": ARTIFACT_TYPE_OPTIONS,
+        "artifactRepository": ARTIFACT_REPOSITORY_OPTIONS,
+        "deploymentExecutionModel": DEPLOYMENT_EXECUTION_MODEL_OPTIONS,
+        "releaseApprovalMode": RELEASE_APPROVAL_MODE_OPTIONS,
+    }
+    for key, allowed_values in option_map.items():
+        if delivery_devops_profile[key] not in allowed_values:
+            raise ValueError(f"Unsupported deliveryDevopsProfile.{key}: {delivery_devops_profile[key]}")
 
     coordination_keys = [
         "requiredAgentRoles",
@@ -977,6 +1150,7 @@ def derive_context_manifest(spec: dict) -> dict:
         deep_path_docs.append("docs/ai/lifecycle.md")
     if organization_profile == "egov-public-sector":
         fast_path_docs.append("docs/ai/org-specific/egov-public-sector-guide.md")
+        fast_path_docs.append("docs/ai/org-specific/egov-delivery-devops-scm-guide.md")
         deep_path_docs.extend(
             [
                 "docs/ai/prompts/org-specific/egov-public-sector/README.md",
@@ -993,6 +1167,7 @@ def derive_context_manifest(spec: dict) -> dict:
         "runtimeRoles": spec.get("runtimeRoles", []),
         "fastPathDocs": unique(fast_path_docs),
         "deepPathDocs": unique(deep_path_docs),
+        "deliveryDevopsProfile": normalize_delivery_devops_profile(spec.get("deliveryDevopsProfile"), spec),
         "recommendedCoordinationMode": coordination_mode["mode"],
         "coordinationModeSummary": coordination_mode["summary"],
         "coordinationModeReasons": list(coordination_mode["reasons"]),
@@ -1223,6 +1398,9 @@ def derive_refinement_manifest(spec: dict, scaffold_profile: str | None, support
                     "RFP나 과업지시서가 JSP/Spring MVC 고정, FE/BE 분리 허용, MPA 우선 + 일부 AJAX 중 어디를 요구하는가?",
                     "전자정부/KRDS 기준에서 먼저 맞춰야 할 문서와 검증 항목은 무엇인가?",
                     "SEO, 크로스브라우징, 모바일 동등성, 공공 웹 품질 기준을 spec에 어떤 값으로 남길 것인가?",
+                    "형상관리 기준이 Git, SVN, 혼합 중 무엇이며 저장소 source of truth는 어디인가?",
+                    "CI, artifact 반입 경로, 배포 실행 모델을 어떤 값으로 spec에 남길 것인가?",
+                    "smoke owner와 rollback owner를 누구로 둘 것인가?",
                     "공통컴포넌트, 공통 자산, parity/rollback 중 어느 축이 현재 저장소에서 가장 중요한가?",
                     "공공 UI, 접근성, 운영 반영 절차를 어떤 체크리스트와 prompt로 고정할 것인가?",
                 ],
@@ -1972,6 +2150,10 @@ def normalize_spec(spec: dict) -> dict:
         normalized["organizationProfile"],
         normalized["frontendArchitecturePolicy"],
     )
+    normalized["deliveryDevopsProfile"] = normalize_delivery_devops_profile(
+        normalized.get("deliveryDevopsProfile"),
+        normalized,
+    )
     derived = derive_agent_coordination(normalized)
     for key, value in derived.items():
         if key not in normalized or not normalized.get(key):
@@ -2206,6 +2388,7 @@ def write_root_readme(
         organization_profile,
         frontend_architecture_policy,
     )
+    delivery_devops_profile = normalize_delivery_devops_profile(spec.get("deliveryDevopsProfile"), spec)
     starter_command = "python3 scripts/show_start_path.py"
     if coordination_mode["mode"] == "lite":
         next_steps = [
@@ -2257,12 +2440,14 @@ def write_root_readme(
 - Logging mode: `{spec['loggingMode']}`
 - Target environments: `{', '.join(spec['targetEnvironments'])}`
 {f"- Public web constraints: SEO `{public_web_constraints['seoSensitivity']}`, page delivery `{public_web_constraints['pageDeliveryPolicy']}`, AJAX `{public_web_constraints['ajaxPolicy']}`" if organization_profile == "egov-public-sector" and frontend_architecture_policy != "not-applicable" else ""}
+{f"- Delivery / DevOps profile: {summarize_delivery_devops_profile(delivery_devops_profile)}" if organization_profile == "egov-public-sector" else ""}
 - Required agent roles: `{', '.join(spec['requiredAgentRoles'])}`
 - Optional agent roles: `{', '.join(spec['optionalAgentRoles'])}`
 - Scaffold profile: `{scaffold_profile or 'docs-only'}`
 - Scaffold support level: `{support_level}`
 {f"- Scaffold support note: {support_reason}" if support_reason else ""}
 {f"- Organization profile guide: `docs/ai/org-specific/egov-public-sector-guide.md`" if organization_profile == "egov-public-sector" else ""}
+{f"- Delivery / DevOps guide: `docs/ai/org-specific/egov-delivery-devops-scm-guide.md`" if organization_profile == "egov-public-sector" else ""}
 
 ## Foundry Provenance
 
@@ -2290,7 +2475,7 @@ Why this mode:
 
 이 명령은 현재 저장소의 추천 mode, blocking refinement, workboard 상태를 읽고 지금 바로 할 3가지 액션만 보여준다.
 또한 `.agent-base/generation-manifest.json`을 함께 보면 이 저장소를 만든 foundry baseline과 commit provenance를 확인할 수 있다.
-`organizationProfile`이 `egov-public-sector`라면 `docs/ai/org-specific/egov-public-sector-guide.md`와 공공 UI checklist/prompt를 먼저 같이 보는 편이 안전하다.
+`organizationProfile`이 `egov-public-sector`라면 `docs/ai/org-specific/egov-public-sector-guide.md`, `docs/ai/org-specific/egov-delivery-devops-scm-guide.md`, 공공 UI checklist/prompt를 먼저 같이 보는 편이 안전하다.
 현재 사용하는 AI 모델 tier를 알고 있으면 `.agent-base/model-routing.json`과 같이 비교하도록 AI에게 요청하거나 아래처럼 helper에 직접 넘길 수 있다.
 
 ```bash
@@ -2321,6 +2506,7 @@ def write_repo_local_overrides(target_dir: Path, spec: dict, refinement_manifest
         spec.get("organizationProfile", "none"),
         frontend_architecture_policy,
     )
+    delivery_devops_profile = normalize_delivery_devops_profile(spec.get("deliveryDevopsProfile"), spec)
     lines = [
         "# Repo-Local Overrides",
         "",
@@ -2371,6 +2557,24 @@ def write_repo_local_overrides(target_dir: Path, spec: dict, refinement_manifest
         )
         if public_web_constraints["notes"]:
             lines.append("- Public web notes: " + ", ".join(public_web_constraints["notes"]))
+    if spec.get("organizationProfile", "none") == "egov-public-sector":
+        lines.extend(
+            [
+                "",
+                "## Delivery / DevOps Profile",
+                "",
+                f"- Source control: `{delivery_devops_profile['sourceControl']}`",
+                f"- CI system: `{delivery_devops_profile['ciSystem']}`",
+                f"- Artifact type: `{delivery_devops_profile['artifactType']}`",
+                f"- Artifact repository: `{delivery_devops_profile['artifactRepository']}`",
+                f"- Deployment execution model: `{delivery_devops_profile['deploymentExecutionModel']}`",
+                f"- Release approval mode: `{delivery_devops_profile['releaseApprovalMode']}`",
+                f"- Smoke owner: `{delivery_devops_profile['smokeOwner'] or '-'}`",
+                f"- Rollback owner: `{delivery_devops_profile['rollbackOwner'] or '-'}`",
+            ]
+        )
+        if delivery_devops_profile["notes"]:
+            lines.append("- Delivery / DevOps notes: " + ", ".join(delivery_devops_profile["notes"]))
     lines.extend(
         [
             "",
@@ -2566,6 +2770,10 @@ def write_generation_artifacts(
             spec.get("publicWebConstraints"),
             spec.get("organizationProfile", "none"),
             spec.get("frontendArchitecturePolicy", "not-applicable"),
+        ),
+        "deliveryDevopsProfile": normalize_delivery_devops_profile(
+            spec.get("deliveryDevopsProfile"),
+            spec,
         ),
         "scaffoldProfile": scaffold_profile,
         "supportLevel": support_level,

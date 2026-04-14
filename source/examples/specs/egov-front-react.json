@@ -41,6 +41,17 @@
     ],
     "notes": []
   },
+  "deliveryDevopsProfile": {
+    "sourceControl": "Git",
+    "ciSystem": "Jenkins",
+    "artifactType": "static-bundle",
+    "artifactRepository": "shared-storage",
+    "deploymentExecutionModel": "manual-file-handover",
+    "releaseApprovalMode": "operator-approval",
+    "smokeOwner": "",
+    "rollbackOwner": "",
+    "notes": []
+  },
   "language": "TypeScript",
   "runtimeVersion": "22 LTS",
   "framework": "React",

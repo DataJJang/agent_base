@@ -15,28 +15,29 @@
 5. `constraintMode`가 `fixed-target` 또는 `legacy-maintenance`면 실제 운영 환경, OS 버전, runtime/framework policy를 먼저 고정한다.
 6. [`stack-matrix.md`](./stack-matrix.md) 기준으로 언어, 프레임워크, 런타임, 빌드 도구, 테스트 도구를 확정한다.
 7. 저장소 구성 방식, DB, cache, 배포 유형, 서비스 기동 형태, 로깅 방식, 동작 OS를 확정한다.
-8. [`project-generation-spec.md`](./project-generation-spec.md) 입력값을 모두 채운다.
-9. [`project-selection-mapping.md`](./project-selection-mapping.md) 기준으로 적합한 템플릿, 초기 산출물, 추천 agent 역할 세트를 확정한다.
-10. [`roles/README.md`](./roles/README.md) 와 [`../../checklists/agent-role-selection.md`](../../checklists/agent-role-selection.md) 를 사용해 required/optional 역할을 고른다.
-11. bootstrap CLI 또는 generator가 파생한 `requiredAgentRoles`, `optionalAgentRoles`, `roleSpecializations`, `agentWorkflowOrder`를 확인한다.
-12. spec JSON을 저장하고 [`project-generator.md`](./project-generator.md) 기준으로 생성기를 실행한다.
-13. spec 옆 `*.refinement.json` 또는 생성된 저장소의 `.agent-base/refinement-manifest.json`을 보고 high-priority 심화 모듈부터 처리한다.
-14. 생성된 저장소에서 `python3 scripts/update_refinement_status.py --interactive --append-to-overrides`를 실행해 다음 pending module부터 정리한다.
-15. spec 옆 `*.refinement-status.json` 또는 생성된 저장소의 `.agent-base/refinement-status.json`에 현재 결정을 기록한다.
-16. `docs/ai/repo-local-overrides.md`에 기본값 유지 이유, 예외, defer note를 남긴다.
-17. 생성된 샘플 저장소의 `.agent-base/context-manifest.json`을 보고 fast path 문서와 core roles를 먼저 확인한다.
-18. 생성된 샘플 저장소의 `.agent-base/agent-workboard.json`을 열어 design-freeze, runtime, validator, docs lane의 owned path와 next handoff를 확정한다.
-19. blocker가 풀리면 `python3 scripts/update_agent_workboard.py --finalize-design-freeze`를 실행해 첫 execution packet을 고정한다.
-20. 첫 전달 전에는 `python3 scripts/update_agent_workboard.py --check-packets --strict`로 packet freshness를 확인한다.
-21. 생성된 저장소에서 `python3 scripts/update_agent_workboard.py --interactive --append-handoff`를 실행해 현재 실행 lane과 handoff history를 갱신한다.
-22. 생성된 샘플 저장소에서 `python3 scripts/install_git_hooks.py`를 실행해 local pre-commit gate를 설치한다.
-23. 생성된 샘플 저장소에서 `AGENTS.md`, `docs/ai/command-catalog.md`, `docs/ai/architecture-map.md`를 저장소 실정에 맞게 보정한다.
-24. DB를 소유하는 저장소면 [`database-rules.md`](./database-rules.md) 기준으로 naming, COMMENT, migration, 위험 SQL 원칙을 확정한다.
-25. [`../../checklists/project-interview.md`](../../checklists/project-interview.md), [`../../checklists/agent-role-selection.md`](../../checklists/agent-role-selection.md), [`../../checklists/project-creation.md`](../../checklists/project-creation.md) 를 완료한다.
-26. `docs/ai/prompts/examples/*`, `docs/ai/prompts/*.md`, `docs/ai/prompts/roles/*.md`를 사용해 첫 프롬프트를 실행한다.
-27. 첫 build/test/문서 세트를 만든다.
-28. 역할 간 분업이 있으면 [`../../checklists/agent-handoff.md`](../../checklists/agent-handoff.md) 와 `docs/ai/agent-handoff-log.md`로 handoff artifact를 정리한다.
-29. 첫 공유 전달 전 [`../../checklists/first-delivery.md`](../../checklists/first-delivery.md) 와 [`../../checklists/agent-completion-review.md`](../../checklists/agent-completion-review.md) 를 점검한다.
+8. `organizationProfile = egov-public-sector`면 `frontendArchitecturePolicy`, `publicWebConstraints`, `deliveryDevopsProfile`까지 같이 확정한다.
+9. [`project-generation-spec.md`](./project-generation-spec.md) 입력값을 모두 채운다.
+10. [`project-selection-mapping.md`](./project-selection-mapping.md) 기준으로 적합한 템플릿, 초기 산출물, 추천 agent 역할 세트를 확정한다.
+11. [`roles/README.md`](./roles/README.md) 와 [`../../checklists/agent-role-selection.md`](../../checklists/agent-role-selection.md) 를 사용해 required/optional 역할을 고른다.
+12. bootstrap CLI 또는 generator가 파생한 `requiredAgentRoles`, `optionalAgentRoles`, `roleSpecializations`, `agentWorkflowOrder`를 확인한다.
+13. spec JSON을 저장하고 [`project-generator.md`](./project-generator.md) 기준으로 생성기를 실행한다.
+14. spec 옆 `*.refinement.json` 또는 생성된 저장소의 `.agent-base/refinement-manifest.json`을 보고 high-priority 심화 모듈부터 처리한다.
+15. 생성된 저장소에서 `python3 scripts/update_refinement_status.py --interactive --append-to-overrides`를 실행해 다음 pending module부터 정리한다.
+16. spec 옆 `*.refinement-status.json` 또는 생성된 저장소의 `.agent-base/refinement-status.json`에 현재 결정을 기록한다.
+17. `docs/ai/repo-local-overrides.md`에 기본값 유지 이유, 예외, defer note를 남긴다.
+18. 생성된 샘플 저장소의 `.agent-base/context-manifest.json`을 보고 fast path 문서와 core roles를 먼저 확인한다.
+19. 생성된 샘플 저장소의 `.agent-base/agent-workboard.json`을 열어 design-freeze, runtime, validator, docs lane의 owned path와 next handoff를 확정한다.
+20. blocker가 풀리면 `python3 scripts/update_agent_workboard.py --finalize-design-freeze`를 실행해 첫 execution packet을 고정한다.
+21. 첫 전달 전에는 `python3 scripts/update_agent_workboard.py --check-packets --strict`로 packet freshness를 확인한다.
+22. 생성된 저장소에서 `python3 scripts/update_agent_workboard.py --interactive --append-handoff`를 실행해 현재 실행 lane과 handoff history를 갱신한다.
+23. 생성된 샘플 저장소에서 `python3 scripts/install_git_hooks.py`를 실행해 local pre-commit gate를 설치한다.
+24. 생성된 샘플 저장소에서 `AGENTS.md`, `docs/ai/command-catalog.md`, `docs/ai/architecture-map.md`를 저장소 실정에 맞게 보정한다.
+25. DB를 소유하는 저장소면 [`database-rules.md`](./database-rules.md) 기준으로 naming, COMMENT, migration, 위험 SQL 원칙을 확정한다.
+26. [`../../checklists/project-interview.md`](../../checklists/project-interview.md), [`../../checklists/agent-role-selection.md`](../../checklists/agent-role-selection.md), [`../../checklists/project-creation.md`](../../checklists/project-creation.md) 를 완료한다.
+27. `docs/ai/prompts/examples/*`, `docs/ai/prompts/*.md`, `docs/ai/prompts/roles/*.md`를 사용해 첫 프롬프트를 실행한다.
+28. 첫 build/test/문서 세트를 만든다.
+29. 역할 간 분업이 있으면 [`../../checklists/agent-handoff.md`](../../checklists/agent-handoff.md) 와 `docs/ai/agent-handoff-log.md`로 handoff artifact를 정리한다.
+30. 첫 공유 전달 전 [`../../checklists/first-delivery.md`](../../checklists/first-delivery.md) 와 [`../../checklists/agent-completion-review.md`](../../checklists/agent-completion-review.md) 를 점검한다.
 
 ## 3. 대화형 인터뷰 질문 순서
 
@@ -62,9 +63,11 @@
 18. 로깅 방식
 19. 동작 OS
 20. 보안 또는 인증 방식
-21. 외부 연동
-22. 기본 문서 세트
-23. spec 저장 경로와 output root
+21. 공공 `web-app`이면 `frontendArchitecturePolicy`와 `publicWebConstraints`
+22. 공공 profile이면 `deliveryDevopsProfile`
+23. 외부 연동
+24. 기본 문서 세트
+25. spec 저장 경로와 output root
 
 인터뷰 자체에서 역할을 직접 묻지 않아도 된다. 역할은 인터뷰 결과를 바탕으로 `project-selection-mapping.md`와 `roles/README.md`에서 파생하고, CLI/generator는 그 결과를 spec와 `.agent-base/agent-role-plan.json`에 남긴다.
 
@@ -90,6 +93,7 @@
 - `frontendArchitecturePolicy = jsp-mvc` 또는 `mpa-plus-ajax`면 `Java 17 + Maven + eGovFrame 4.3 JSP/Spring MVC`를 기본 제안으로 사용한다.
 - `frontendArchitecturePolicy = separated-frontend-api`면 `TypeScript + React`를 유지하되 공공 웹 제약과 API 분리 기준을 같이 기록한다.
 - 공공 `web-app`에서 `frontendArchitecturePolicy = undecided`면 quick-start 대신 `guided-review`로 전환한다.
+- `organizationProfile = egov-public-sector`면 `deliveryDevopsProfile`로 `Git/SVN`, `CI`, `artifact`, `배포 실행 모델`, `릴리즈 승인`, `smoke/rollback owner`를 같이 남긴다.
 - `mobile-app`은 `Flutter`를 기본 권장으로 제안하고, 팀 경험이나 native 요구가 있으면 `React Native`, `Kotlin`, `Swift`를 선택지로 제공한다.
 - `backend-service`는 `Java 17 + Spring Boot 3.5.x`를 기본으로 제안한다.
 - `organizationProfile = egov-public-sector`인 `backend-service`, `batch-worker`는 `Java 17 + Maven + eGovFrame 4.3` 계열도 기본 제안으로 사용한다.
@@ -118,6 +122,7 @@
 - 대상 환경 `local/dev/stg/prd`
 - 기본 운영 문서 세트
 - 핵심 외부 연동
+- `organizationProfile = egov-public-sector`면 `deliveryDevopsProfile`
 - DB를 소유하는 경우 DB 엔진/버전, migration 위치, verification query 작성 기준
 
 ## 7. 런타임 역할별 첫 보정 포인트

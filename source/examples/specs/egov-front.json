@@ -37,6 +37,17 @@
     "frontendFrameworkAllowed": [],
     "notes": []
   },
+  "deliveryDevopsProfile": {
+    "sourceControl": "Git",
+    "ciSystem": "Jenkins",
+    "artifactType": "war",
+    "artifactRepository": "Nexus",
+    "deploymentExecutionModel": "manual-was-deploy",
+    "releaseApprovalMode": "operator-approval",
+    "smokeOwner": "",
+    "rollbackOwner": "",
+    "notes": []
+  },
   "language": "Java",
   "runtimeVersion": "17",
   "framework": "eGovFrame 4.3 JSP/Spring MVC",

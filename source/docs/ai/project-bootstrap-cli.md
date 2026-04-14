@@ -59,11 +59,20 @@ CLI는 아래 순서로 질문한다.
 12. `fixed-target` 또는 `legacy-maintenance`면 고정 운영 환경, OS, runtime/framework policy, container 허용 여부를 먼저 확인한다.
 13. `guided-review` 또는 `full-detail`이면 저장소 구성 방식부터 세부 항목을 순서대로 확인한다.
 14. `organizationProfile = egov-public-sector`이고 `web-app` 또는 `pwa`면 `publicWebConstraints`를 함께 확인할 수 있다.
-15. DB 관련 추가 항목
-16. 기본 문서 세트
-17. 추가 예외/메모
-18. output root
-19. spec 저장 경로
+15. `organizationProfile = egov-public-sector`면 `deliveryDevopsProfile`
+  - `sourceControl`
+  - `ciSystem`
+  - `artifactType`
+  - `artifactRepository`
+  - `deploymentExecutionModel`
+  - `releaseApprovalMode`
+  - `smokeOwner`
+  - `rollbackOwner`
+16. DB 관련 추가 항목
+17. 기본 문서 세트
+18. 추가 예외/메모
+19. output root
+20. spec 저장 경로
 
 핵심 의도는 `최종 spec에는 값이 있어야 하지만, 초기 인터뷰에서 사용자가 모든 값을 같은 무게로 직접 입력하지는 않아도 된다`는 점이다.
 
@@ -76,6 +85,7 @@ CLI는 아래를 만든다.
 - spec 옆 `*.refinement-status.json`
 - `organizationProfile` 기반 overlay 문서 라우팅
 - `frontendArchitecturePolicy`, `publicWebConstraints` 정규화
+- `deliveryDevopsProfile` 정규화
 - 자동 파생된 `requiredAgentRoles`, `optionalAgentRoles`, `roleSpecializations`, `agentWorkflowOrder`
 - 선택된 template 이름
 - 선택된 scaffold profile 이름
@@ -86,7 +96,7 @@ CLI는 아래를 만든다.
 
 spec은 `.agent-base/project-generation-spec.json`으로도 생성 저장소 안에 다시 남고, generator는 `.agent-base/generation-manifest.json`, `.agent-base/context-manifest.json`, `.agent-base/agent-role-plan.json`, `.agent-base/refinement-manifest.json`, `.agent-base/refinement-status.json`, `.agent-base/agent-workboard.json`, `.agent-base/model-routing.json`, `docs/ai/agent-handoff-log.md`를 같이 만든다. 이 중 `.agent-base/context-manifest.json`과 root `README.md`에는 추천 coordination mode와 이유가 같이 들어간다.
 또한 생성된 저장소에는 `scripts/show_start_path.py`가 들어가며, 현재 repo state 기준 top 3 action, model tier warning, foundry provenance를 바로 보여줄 수 있다.
-`organizationProfile`이 `egov-public-sector`라면 `context-manifest`, `generation-manifest`, root `README.md`에서 그 profile과 공공 특화 guide 경로를 같이 확인할 수 있다.
+`organizationProfile`이 `egov-public-sector`라면 `context-manifest`, `generation-manifest`, root `README.md`에서 그 profile과 공공 특화 guide 경로를 같이 확인할 수 있다. 특히 `egov-delivery-devops-scm-guide.md`가 start path와 manifest에 함께 노출된다.
 신규 전자정부 프로젝트에서 `backend-service`, `web-app`, `batch-worker`를 함께 시작한다면 생성 직후 후속 작업은 [`org-specific/egov-new-project-playbook.md`](./org-specific/egov-new-project-playbook.md) 순서로 정리하는 편이 좋다.
 
 ## 6. 주의사항
@@ -97,6 +107,7 @@ spec은 `.agent-base/project-generation-spec.json`으로도 생성 저장소 안
 - DB를 소유하는 저장소는 `dbEngine`, `schemaOwnership`, `migrationPath`를 함께 기록해야 한다.
 - quick-start baseline은 일반적인 로컬 시작 경로를 위한 기본값이다. production, rollout, shared DB 같은 조건이 있으면 `guided-review` 또는 `full-detail`로 전환하는 편이 안전하다.
 - `organizationProfile = egov-public-sector`인 `web-app`은 `organizationProfile`만으로 JSP를 고정하지 않는다. 대신 `frontendArchitecturePolicy`를 먼저 확인하고, 미정이면 quick-start 대신 `guided-review`로 올린다.
+- `organizationProfile = egov-public-sector`이면 quick-start에서도 `deliveryDevopsProfile` 기본값을 spec에 남긴다. guided-review 이상에서는 `Git/SVN`, `CI`, `artifact`, `반입/배포 모델`, `smoke/rollback owner`를 직접 확인할 수 있다.
 - `fixed-target` 또는 `legacy-maintenance`는 baseline 추천보다 실제 운영 제약을 우선한다.
 - 이 경우 CLI는 quick-start를 그대로 유지하지 않고 최소 `guided-review`로 올려 runtime/framework/deployment를 직접 확인한다.
 - 현재 runnable scaffold가 그 제약을 만족하지 못하면 generator는 실패하지 않고 `docs-only`로 강등하며, 이유를 summary와 generation manifest에 남긴다.

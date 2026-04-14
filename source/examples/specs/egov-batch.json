@@ -36,6 +36,17 @@
     "frontendFrameworkAllowed": [],
     "notes": []
   },
+  "deliveryDevopsProfile": {
+    "sourceControl": "Git",
+    "ciSystem": "Jenkins",
+    "artifactType": "jar",
+    "artifactRepository": "Nexus",
+    "deploymentExecutionModel": "pipeline-to-vm",
+    "releaseApprovalMode": "operator-approval",
+    "smokeOwner": "",
+    "rollbackOwner": "",
+    "notes": []
+  },
   "language": "Java",
   "runtimeVersion": "17",
   "framework": "eGovFrame 4.3 Batch + MyBatis",

@@ -389,6 +389,7 @@ def minimal_entry_files(mode: str, organization_profile: str = "none") -> list[s
         ]
         if organization_profile == "egov-public-sector":
             files.append("docs/ai/org-specific/egov-public-sector-guide.md")
+            files.append("docs/ai/org-specific/egov-delivery-devops-scm-guide.md")
         return files
     if mode == "coordinated":
         files = [
@@ -399,6 +400,7 @@ def minimal_entry_files(mode: str, organization_profile: str = "none") -> list[s
         ]
         if organization_profile == "egov-public-sector":
             files.append("docs/ai/org-specific/egov-public-sector-guide.md")
+            files.append("docs/ai/org-specific/egov-delivery-devops-scm-guide.md")
         return files
     files = [
         "AGENTS.md",
@@ -408,6 +410,7 @@ def minimal_entry_files(mode: str, organization_profile: str = "none") -> list[s
     ]
     if organization_profile == "egov-public-sector":
         files.append("docs/ai/org-specific/egov-public-sector-guide.md")
+        files.append("docs/ai/org-specific/egov-delivery-devops-scm-guide.md")
     return files
 
 
